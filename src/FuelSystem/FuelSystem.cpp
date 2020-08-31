@@ -172,6 +172,12 @@ namespace FuelSystem {
         for (int i = 0; i < 5; i++) {
             this->enginesFulfilled[i] = true;
         }
+
+
+        this->electricStatus = (bool*) malloc(8 * sizeof(bool)); //8 electrical buses, 5AC, 3DC
+        for (int i = 0; i < 8; i++) {
+            this->electricStatus[i] = false; //the plane starts powered down
+        }
     }
 
     void FuelSystem::printEffectiveNums() {
@@ -193,7 +199,6 @@ namespace FuelSystem {
         std::cout << "TANK FUEL: " << this->tanks[8]->getFuel() << std::endl;
         std::cout << "TANK FUEL: " << this->tanks[9]->getFuel() << std::endl;
         std::cout << "TANK FUEL: " << this->tanks[10]->getFuel() << std::endl;
-
         std::cout << std::endl;
     }
 
@@ -350,6 +355,118 @@ namespace FuelSystem {
         for (int i=0; i<5; i++) {
             this->enginesFulfilled[i] = this->consumers[i]->isFulfilled();
         }
+    }
+
+    //electricStatus = {0: AC_ESS, 1: AC1, 2: AC2, 3: AC3, 4: AC4, 5: DC_ESS, 6: DC1, 7: DC2}
+    void FuelSystem::ACEssChanged(bool powered) {
+        this->electricStatus[0] = powered;
+        this->pumps[2]->setPower(powered || this->electricStatus[5]); //Feed 2 main pump
+        this->pumps[5]->setPower(powered || this->electricStatus[5]); //Feed 3 stby pump
+        this->pumps[18]->setPower(powered || this->electricStatus[5]);//Left trim pump
+    }
+
+    void FuelSystem::AC1Changed(bool powered) {
+        this->electricStatus[1] = powered;
+        this->pumps[10]->setPower(powered || this->electricStatus[6]); //Middle aft pump left
+        this->pumps[16]->setPower(powered || this->electricStatus[6]); //Middle aft pump right
+    }
+
+    void FuelSystem::AC2Changed(bool powered) {
+        this->electricStatus[2] = powered;
+        this->pumps[1]->setPower(powered); //Feed 1 Stby pump
+        this->pumps[6]->setPower(powered); //Feed 4 Main pump
+        this->pumps[8]->setPower(powered || this->electricStatus[6]); //Outer left (fwd)
+        this->pumps[17]->setPower(powered || this->electricStatus[6]); //Outer right (fwd)
+        this->pumps[12]->setPower(powered || this->electricStatus[6]); //Inner left (aft)
+        this->pumps[14]->setPower(powered || this->electricStatus[6]); //Inner right (aft)
+        this->pumps[19]->setPower(powered || this->electricStatus[6]); //Right trim
+    }
+
+    void FuelSystem::AC3Changed(bool powered) {
+        this->electricStatus[3] = powered;
+        this->pumps[3]->setPower(powered); //Feed 2 Stby pump
+        this->pumps[4]->setPower(powered); //Feed 3 Main pump
+        this->pumps[9]->setPower(powered || this->electricStatus[7]); //Mid left (fwd)
+        this->pumps[15]->setPower(powered || this->electricStatus[7]); //Mid right (fwd)
+    }
+
+    void FuelSystem::AC4Changed(bool powered) {
+        this->electricStatus[4] = powered;
+        this->pumps[0]->setPower(powered); //Feed 1 Main pump
+        this->pumps[7]->setPower(powered); //Feed 4 Stby pump
+        this->pumps[11]->setPower(powered || this->electricStatus[7]); //Inner left (fwd)
+        this->pumps[13]->setPower(powered || this->electricStatus[7]); //Inner right (fwd)
+    }
+
+    void FuelSystem::DCEssChanged(bool powered) {
+        this->electricStatus[5] = powered;
+        this->pumps[2]->setPower(powered || this->electricStatus[0]); //Feed 2 main pump
+        this->pumps[5]->setPower(powered || this->electricStatus[0]); //Feed 3 stby pump
+
+        //not sure if all crossfeed valves are supplied by both DC2 and DC_ESS
+        this->tankValves[0]->setPower(powered || this->electricStatus[7]);  //Crossfeed
+        this->tankValves[1]->setPower(powered || this->electricStatus[7]);  //Crossfeed
+        this->tankValves[2]->setPower(powered || this->electricStatus[7]);  //Crossfeed
+        this->tankValves[3]->setPower(powered || this->electricStatus[7]);  //Crossfeed
+
+        this->consumers[0]->setPower(powered || this->electricStatus[7]);  //Engine LP valves
+        this->consumers[1]->setPower(powered || this->electricStatus[7]);  //Engine LP valves
+        this->consumers[2]->setPower(powered || this->electricStatus[7]);  //Engine LP valves
+        this->consumers[3]->setPower(powered || this->electricStatus[7]);  //Engine LP valves
+
+        this->pumps[20]->setPower(powered); //APU pump
+        this->consumers[3]->setPower(powered);  //APU LP & Isol valves
+
+        this->busValves[5]->setPower(powered); //Left aux refuel valve
+        this->tankValves[1]->setPower(powered);  //Outer left aft
+        this->tankValves[19]->setPower(powered);  //Outer right aft
+        this->pumps[18]->setPower(powered || this->electricStatus[0]); //Trim Left
+        this->busValves[8]->setPower(powered); //Trim isolation <-> Aft gallery
+    }
+
+    void FuelSystem::DC1Changed(bool powered) {
+        this->electricStatus[6] = powered;
+        this->consumers[5]->setPower(powered || this->electricStatus[7]); //Jettison left
+        this->consumers[6]->setPower(powered || this->electricStatus[7]); //Jettison right
+        this->busValves[4]->setPower(powered); //Transfer/Defuel valve
+
+        this->pumps[8]->setPower(powered || this->electricStatus[2]); //Outer left (fwd)
+        this->pumps[17]->setPower(powered || this->electricStatus[2]); //Outer right (fwd)
+        this->pumps[10]->setPower(powered || this->electricStatus[1]); //Middle aft pump left
+        this->pumps[16]->setPower(powered || this->electricStatus[1]); //Middle aft pump right
+        this->pumps[12]->setPower(powered || this->electricStatus[2]); //Inner left (aft)
+        this->pumps[14]->setPower(powered || this->electricStatus[2]); //Inner right (aft)
+        this->tankValves[20]->setPower(powered); //Trim left valve
+        this->pumps[19]->setPower(powered || this->electricStatus[2]); //Right trim
+        this->busValves[7]->setPower(powered); //Trim isolation <-> Fwd gallery
+    }
+
+    void FuelSystem::DC2Changed(bool powered) {
+        this->electricStatus[7] = powered;
+        //not sure if all crossfeed valves are supplied by both DC2 and DC_ESS
+        this->tankValves[0]->setPower(powered || this->electricStatus[5]);  //Crossfeed
+        this->tankValves[1]->setPower(powered || this->electricStatus[5]);  //Crossfeed
+        this->tankValves[2]->setPower(powered || this->electricStatus[5]);  //Crossfeed
+        this->tankValves[3]->setPower(powered || this->electricStatus[5]);  //Crossfeed
+
+        this->consumers[0]->setPower(powered || this->electricStatus[5]);  //Engine LP valves
+        this->consumers[1]->setPower(powered || this->electricStatus[5]);  //Engine LP valves
+        this->consumers[2]->setPower(powered || this->electricStatus[5]);  //Engine LP valves
+        this->consumers[3]->setPower(powered || this->electricStatus[5]);  //Engine LP valves
+
+        this->consumers[5]->setPower(powered || this->electricStatus[6]); //Jettison left
+        this->consumers[6]->setPower(powered || this->electricStatus[6]); //Jettison right
+
+        this->busValves[6]->setPower(powered); //Right aux refuel valve
+        this->tankValves[0]->setPower(powered);  //Outer left fwd
+        this->tankValves[18]->setPower(powered);  //Outer right fwd
+
+        this->pumps[9]->setPower(powered || this->electricStatus[3]); //Mid left (fwd)
+        this->pumps[15]->setPower(powered || this->electricStatus[3]); //Mid right (fwd)
+        this->pumps[11]->setPower(powered || this->electricStatus[4]); //Inner left (fwd)
+        this->pumps[13]->setPower(powered || this->electricStatus[4]); //Inner right (fwd)
+
+        this->tankValves[21]->setPower(powered); //Trim right valve
     }
 
 }

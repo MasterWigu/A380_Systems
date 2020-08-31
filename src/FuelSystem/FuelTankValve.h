@@ -11,6 +11,8 @@ namespace FuelSystem {
     private:
         FuelSystem::FuelTank* valveLocation;
         int state = 0; // 0=Closed, 1=Opened
+        int commandedState = 0;
+        int isPowered;
         int gravFeedRate = 0;  //if 0, valve cannot gravFeed
 
     public:
@@ -25,6 +27,10 @@ namespace FuelSystem {
 
         int getGravFeedable();
         void gravityFeed(int amount);
+
+        void setPower(bool p);
+        bool getPower();
+
     };
 }
 

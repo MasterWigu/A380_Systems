@@ -9,10 +9,14 @@ namespace FuelSystem {
         this->bus1 = location1;
         this->bus2 = location2;
         this->state = 0;
+        this->commandedState = 0;
+        this->isPowered = false;
     }
 
     void FuelSystem::FuelBusValve::setState(int nState) {
-        this->state = nState;
+        this->commandedState = nState;
+        if (this->isPowered) //if the valve is not powered, cant change state
+            this->state = nState;
     }
 
     int FuelBusValve::getState() {
@@ -25,6 +29,16 @@ namespace FuelSystem {
 
     FuelBus *FuelBusValve::getLocation2() {
         return this->bus2;
+    }
+
+    void FuelBusValve::setPower(bool p) {
+        this->isPowered = p;
+        if (p) // when it gets power again, we revert state to the correct one
+            this->state = this->commandedState;
+    }
+
+    bool FuelBusValve::getPower() {
+        return this->isPowered;
     }
 
 }

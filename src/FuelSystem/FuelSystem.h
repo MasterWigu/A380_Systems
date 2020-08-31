@@ -18,6 +18,8 @@ namespace FuelSystem {
         FuelBusValve** busValves;
         FuelBus** fuelBuses;
         FuelConsumer** consumers;
+
+        bool* electricStatus;
         
         bool* enginesFulfilled;
 
@@ -31,6 +33,15 @@ namespace FuelSystem {
         void testSystem();
 
         void debugPrint();
+
+        void ACEssChanged(bool powered);
+        void AC1Changed(bool powered);
+        void AC2Changed(bool powered);
+        void AC3Changed(bool powered);
+        void AC4Changed(bool powered);
+        void DCEssChanged(bool powered);
+        void DC1Changed(bool powered);
+        void DC2Changed(bool powered);
     };
 }
 

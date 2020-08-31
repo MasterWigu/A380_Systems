@@ -9,16 +9,22 @@ namespace FuelSystem {
     FuelSystem::FuelTankValve::FuelTankValve(FuelSystem::FuelTank *location) {
         this->valveLocation = location;
         this->state = 0;
+        this->isPowered = false;
+        this->commandedState = 0;
     }
 
     FuelTankValve::FuelTankValve(FuelSystem::FuelTank *location, int feedRate) {
         this->valveLocation = location;
         this->state = 0;
+        this->commandedState = 0;
+        this->isPowered = false;
         this->gravFeedRate = feedRate;
     }
 
     void FuelSystem::FuelTankValve::setState(int nState) {
-        this->state = nState;
+        this->commandedState = nState;
+        if (this->isPowered) //if the valve is not powered, cant change state
+            this->state = nState;
     }
 
     int FuelTankValve::getState() const {
@@ -50,5 +56,15 @@ namespace FuelSystem {
 
     void FuelTankValve::gravityFeed(int amount) {
         this->valveLocation->removeFuel(amount);
+    }
+
+    void FuelTankValve::setPower(bool p) {
+        this->isPowered = p;
+        if (p) // when it gets power again, we revert state to the correct one
+            this->state = this->commandedState;
+    }
+
+    bool FuelTankValve::getPower() {
+        return this->isPowered;
     }
 }

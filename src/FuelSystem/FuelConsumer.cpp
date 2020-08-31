@@ -8,9 +8,11 @@ namespace FuelSystem {
 
     FuelConsumer::FuelConsumer(int r) {
         this->state = 0; // Starts closed
+        this->commandedState = 0;
         this->rate = r;
         this->lastSupply = 0;
         this->isJettison = false;
+        this->isPowered = false;
     }
 
     FuelConsumer::FuelConsumer(int r, bool jet) {
@@ -18,6 +20,7 @@ namespace FuelSystem {
         this->rate = r;
         this->lastSupply = r;
         this->isJettison = jet;
+        this->isPowered = false;
     }
 
     void FuelConsumer::setRate(int rate) {
@@ -52,12 +55,24 @@ namespace FuelSystem {
     }
 
     void FuelConsumer::setState(int s) {
-        this->state = s;
+        this->commandedState = s;
+        if (this->isPowered) //if the valve is not powered, cant change state
+            this->state = s;
     }
 
     bool FuelConsumer::isFulfilled() {
         if (this->isJettison) return true;
 
         return this->lastSupply >= rate;
+    }
+
+    void FuelConsumer::setPower(bool p) {
+        this->isPowered = p;
+        if (p) // when it gets power again, we revert state to the correct one
+            this->state = this->commandedState;
+    }
+
+    bool FuelConsumer::getPower() {
+        return this->isPowered;
     }
 }

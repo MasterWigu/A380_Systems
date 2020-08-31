@@ -12,6 +12,8 @@ namespace FuelSystem {
     class FuelBusValve {
     private:
         int state = 0; // 0=Closed, 1=Opened
+        int commandedState;
+        bool isPowered;
 
         FuelSystem::FuelBus* bus1;
         FuelSystem::FuelBus* bus2;
@@ -22,6 +24,9 @@ namespace FuelSystem {
 
         FuelBus* getLocation1();
         FuelBus* getLocation2();
+
+        void setPower(bool p);
+        bool getPower();
     };
 }
 

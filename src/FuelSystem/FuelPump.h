@@ -12,6 +12,9 @@ namespace FuelSystem{
     private:
         int maxPumpRate = 0; //In kg/h
         int state = 0; // 0-Off, 1-On
+        int commandedState;
+        bool hasPower;
+        bool isFailed;
 
         FuelSystem::FuelTank* pumpLocation;
 
@@ -23,6 +26,13 @@ namespace FuelSystem{
 
         void setState(int s);
         int getState();
+
+        void setPower(bool p);
+        bool getPower();
+
+        void setFailed(bool f);
+        bool getFailed();
+
     };
 }
 

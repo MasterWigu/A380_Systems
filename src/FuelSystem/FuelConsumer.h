@@ -10,7 +10,9 @@ namespace FuelSystem {
     private:
         int rate;
         int state; // 0-Closed, 1-Open
+        int commandedState;
         int lastSupply;
+        bool isPowered;
         bool isJettison;
 
     public:
@@ -25,6 +27,9 @@ namespace FuelSystem {
         int consume(int amount);
 
         bool isFulfilled();
+
+        void setPower(bool p);
+        bool getPower();
     };
 }
 
