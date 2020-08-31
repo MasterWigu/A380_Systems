@@ -6,6 +6,7 @@
 #define UNTITLED_FUELSYSTEM_H
 
 #include "FuelBus.h"
+#include "EmergTransValve.h"
 
 namespace FuelSystem {
     class FuelSystem {
@@ -18,6 +19,7 @@ namespace FuelSystem {
         FuelBusValve** busValves;
         FuelBus** fuelBuses;
         FuelConsumer** consumers;
+        EmergTansValve** emergValves;
 
         bool* electricStatus;
         

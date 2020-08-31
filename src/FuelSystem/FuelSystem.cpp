@@ -167,6 +167,10 @@ namespace FuelSystem {
         this->fuelBuses[6]->setBusValves(b7bVls, b7VlsN);
         this->fuelBuses[7]->setBusValves(b8bVls, b8VlsN);
 
+        this->emergValves = (EmergTansValve**) malloc(2 * sizeof(EmergTansValve*));
+        this->emergValves[0] = new EmergTansValve(this->tanks[0], this->tanks[1]); //Left emerg valve
+        this->emergValves[1] = new EmergTansValve(this->tanks[9], this->tanks[8]); //Right emerg valve
+
 
         this->enginesFulfilled = (bool*) malloc(5 * sizeof(bool));
         for (int i = 0; i < 5; i++) {
@@ -422,6 +426,9 @@ namespace FuelSystem {
         this->tankValves[19]->setPower(powered);  //Outer right aft
         this->pumps[18]->setPower(powered || this->electricStatus[0]); //Trim Left
         this->busValves[8]->setPower(powered); //Trim isolation <-> Aft gallery
+
+        this->emergValves[0]->setPower(powered || this->electricStatus[6]); //Left emerg valve
+        this->emergValves[1]->setPower(powered || this->electricStatus[6]); //Left emerg valve
     }
 
     void FuelSystem::DC1Changed(bool powered) {
@@ -439,6 +446,9 @@ namespace FuelSystem {
         this->tankValves[20]->setPower(powered); //Trim left valve
         this->pumps[19]->setPower(powered || this->electricStatus[2]); //Right trim
         this->busValves[7]->setPower(powered); //Trim isolation <-> Fwd gallery
+
+        this->emergValves[0]->setPower(powered || this->electricStatus[5]); //Left emerg valve
+        this->emergValves[1]->setPower(powered || this->electricStatus[5]); //Left emerg valve
     }
 
     void FuelSystem::DC2Changed(bool powered) {

@@ -7,6 +7,15 @@ int main() {
     FuelSystem::FuelSystem f = FuelSystem::FuelSystem();
     //f.printEffectiveNums();
     f.testSystem();
+    f.ACEssChanged(true);
+    f.AC1Changed(true);
+    f.AC2Changed(true);
+    f.AC3Changed(true);
+    f.AC4Changed(true);
+    f.DCEssChanged(true);
+    f.DC1Changed(true);
+    f.DC2Changed(true);
+
 
     for (int i=0;i<10; i++) {
         auto t1 = std::chrono::high_resolution_clock::now();
