@@ -20,6 +20,9 @@ namespace FuelSystem{
         int getPumpable();
         bool canPump();
         void pumpFuel(int amount);
+
+        void setState(int s);
+        int getState();
     };
 }
 

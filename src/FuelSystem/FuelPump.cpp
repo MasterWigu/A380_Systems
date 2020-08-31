@@ -9,6 +9,7 @@ namespace FuelSystem {
     FuelSystem::FuelPump::FuelPump(FuelSystem::FuelTank* location, int rate) {
         this->maxPumpRate = rate;
         this->pumpLocation = location;
+        this->state = 0;
     }
 
     int FuelPump::getPumpable() {
@@ -33,6 +34,14 @@ namespace FuelSystem {
             return true;
         }
         return false;
+    }
+
+    void FuelPump::setState(int s) {
+        this->state = s;
+    }
+
+    int FuelPump::getState() {
+        return this->state;
     }
 
 

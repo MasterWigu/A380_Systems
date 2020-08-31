@@ -5,7 +5,7 @@
 #include "FuelBusValve.h"
 
 namespace FuelSystem {
-    FuelSystem::FuelBusValve::FuelBusValve(FuelSystem::FuelBus *location1, FuelSystem::FuelBus *location2) {
+    FuelSystem::FuelBusValve::FuelBusValve(FuelSystem::FuelBus* location1, FuelSystem::FuelBus* location2) {
         this->bus1 = location1;
         this->bus2 = location2;
         this->state = 0;
@@ -15,8 +15,16 @@ namespace FuelSystem {
         this->state = nState;
     }
 
-    int FuelBusValve::getState() const {
+    int FuelBusValve::getState() {
         return this->state;
+    }
+
+    FuelBus *FuelBusValve::getLocation1() {
+        return this->bus1;
+    }
+
+    FuelBus *FuelBusValve::getLocation2() {
+        return this->bus2;
     }
 
 }

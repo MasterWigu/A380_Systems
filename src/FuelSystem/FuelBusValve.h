@@ -4,19 +4,24 @@
 
 #ifndef UNTITLED_FUELBUSVALVE_H
 #define UNTITLED_FUELBUSVALVE_H
-#include "FuelBus.h"
+
 
 namespace FuelSystem {
+    class FuelBus;
+
     class FuelBusValve {
     private:
-        FuelSystem::FuelBus* bus1;
-        FuelSystem::FuelBus* bus2;
         int state = 0; // 0=Closed, 1=Opened
 
+        FuelSystem::FuelBus* bus1;
+        FuelSystem::FuelBus* bus2;
     public:
-        FuelBusValve(FuelBus *location1, FuelBus *location2);
+        FuelBusValve(FuelSystem::FuelBus *location1, FuelSystem::FuelBus *location2);
         void setState(int nState);
-        int getState() const;
+        int getState();
+
+        FuelBus* getLocation1();
+        FuelBus* getLocation2();
     };
 }
 
