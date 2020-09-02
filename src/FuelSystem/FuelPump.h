@@ -15,11 +15,12 @@ namespace FuelSystem{
         int commandedState;
         bool hasPower;
         bool isFailed;
+        bool isFeed;
 
         FuelSystem::FuelTank* pumpLocation;
 
     public:
-        FuelPump(FuelSystem::FuelTank* location, int rate);
+        FuelPump(FuelSystem::FuelTank* location, int rate, bool iF);
         int getPumpable();
         bool canPump();
         void pumpFuel(int amount);

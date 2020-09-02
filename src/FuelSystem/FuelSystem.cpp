@@ -10,42 +10,42 @@ namespace FuelSystem {
 
         this->tanks = (FuelTank**) malloc(11 * sizeof(FuelTank*));
 
-        this->tanks[0]  = new FuelTank(8117);   //0  - left outer
-        this->tanks[1]  = new FuelTank(21691);  //1  - left feed 1
-        this->tanks[2]  = new FuelTank(28622);  //2  - left mid
-        this->tanks[3]  = new FuelTank(36221);  //3  - left inner
-        this->tanks[4]  = new FuelTank(23039);  //4  - left feed 2
-        this->tanks[5]  = new FuelTank(23039);  //5  - right feed 3
-        this->tanks[6]  = new FuelTank(36221);  //6  - right inner
-        this->tanks[7]  = new FuelTank(28622);  //7  - right mid
-        this->tanks[8]  = new FuelTank(21691);  //8  - right feed 4
-        this->tanks[9]  = new FuelTank(8117);   //9  - right outer
-        this->tanks[10] = new FuelTank(18603); //10 - trim tank
+        this->tanks[0]  = new FuelTank(8117);               //0  - left outer
+        this->tanks[1]  = new FuelTank(21691, 1300); //1  - left feed 1
+        this->tanks[2]  = new FuelTank(28622);              //2  - left mid
+        this->tanks[3]  = new FuelTank(36221);              //3  - left inner
+        this->tanks[4]  = new FuelTank(23039, 1300); //4  - left feed 2
+        this->tanks[5]  = new FuelTank(23039, 1300); //5  - right feed 3
+        this->tanks[6]  = new FuelTank(36221);              //6  - right inner
+        this->tanks[7]  = new FuelTank(28622);              //7  - right mid
+        this->tanks[8]  = new FuelTank(21691, 1300); //8  - right feed 4
+        this->tanks[9]  = new FuelTank(8117);               //9  - right outer
+        this->tanks[10] = new FuelTank(18603);              //10 - trim tank
 
 
         this->pumps = (FuelPump**) malloc(21 * sizeof(FuelPump*));
 
-        this->pumps[0]  = new FuelPump(this->tanks[1], 15000);  //0  - Feed 1 main
-        this->pumps[1]  = new FuelPump(this->tanks[1], 15000);  //1  - Feed 1 stby
-        this->pumps[2]  = new FuelPump(this->tanks[4], 15000);  //2  - Feed 2 main
-        this->pumps[3]  = new FuelPump(this->tanks[4], 15000);  //3  - Feed 2 stby
-        this->pumps[4]  = new FuelPump(this->tanks[5], 15000);  //4  - Feed 3 main
-        this->pumps[5]  = new FuelPump(this->tanks[5], 15000);  //5  - Feed 3 stby
-        this->pumps[6]  = new FuelPump(this->tanks[8], 15000);  //6  - Feed 4 main
-        this->pumps[7]  = new FuelPump(this->tanks[8], 15000);  //7  - Feed 4 stby
-        this->pumps[8]  = new FuelPump(this->tanks[0], 15000);  //8  - Left outer pump
-        this->pumps[9]  = new FuelPump(this->tanks[2], 15000);  //9  - Fwd left mid
-        this->pumps[10] = new FuelPump(this->tanks[2], 15000);  //10 - Aft left mid
-        this->pumps[11] = new FuelPump(this->tanks[3], 15000);  //11 - Fwd left inner
-        this->pumps[12] = new FuelPump(this->tanks[3], 15000);  //12 - Aft left inner
-        this->pumps[13] = new FuelPump(this->tanks[6], 15000);  //13 - Fwd right inner
-        this->pumps[14] = new FuelPump(this->tanks[6], 15000);  //14 - Aft right inner
-        this->pumps[15] = new FuelPump(this->tanks[7], 15000);  //15 - Fwd right mid
-        this->pumps[16] = new FuelPump(this->tanks[7], 15000);  //16 - Aft right mid
-        this->pumps[17] = new FuelPump(this->tanks[9], 15000);  //17 - Right outer
-        this->pumps[18] = new FuelPump(this->tanks[10], 10000); //18 - Trim left
-        this->pumps[19] = new FuelPump(this->tanks[10], 10000); //19 - Trim right
-        this->pumps[20] = new FuelPump(this->tanks[7], 10000);  //20 - APU
+        this->pumps[0]  = new FuelPump(this->tanks[1], 15000, true);   //0  - Feed 1 main
+        this->pumps[1]  = new FuelPump(this->tanks[1], 15000, true);   //1  - Feed 1 stby
+        this->pumps[2]  = new FuelPump(this->tanks[4], 15000, true);   //2  - Feed 2 main
+        this->pumps[3]  = new FuelPump(this->tanks[4], 15000, true);   //3  - Feed 2 stby
+        this->pumps[4]  = new FuelPump(this->tanks[5], 15000, true);   //4  - Feed 3 main
+        this->pumps[5]  = new FuelPump(this->tanks[5], 15000, true);   //5  - Feed 3 stby
+        this->pumps[6]  = new FuelPump(this->tanks[8], 15000, true);   //6  - Feed 4 main
+        this->pumps[7]  = new FuelPump(this->tanks[8], 15000, true);   //7  - Feed 4 stby
+        this->pumps[8]  = new FuelPump(this->tanks[0], 15000, false);  //8  - Left outer pump
+        this->pumps[9]  = new FuelPump(this->tanks[2], 15000, false);  //9  - Fwd left mid
+        this->pumps[10] = new FuelPump(this->tanks[2], 15000, false);  //10 - Aft left mid
+        this->pumps[11] = new FuelPump(this->tanks[3], 15000, false);  //11 - Fwd left inner
+        this->pumps[12] = new FuelPump(this->tanks[3], 15000, false);  //12 - Aft left inner
+        this->pumps[13] = new FuelPump(this->tanks[6], 15000, false);  //13 - Fwd right inner
+        this->pumps[14] = new FuelPump(this->tanks[6], 15000, false);  //14 - Aft right inner
+        this->pumps[15] = new FuelPump(this->tanks[7], 15000, false);  //15 - Fwd right mid
+        this->pumps[16] = new FuelPump(this->tanks[7], 15000, false);  //16 - Aft right mid
+        this->pumps[17] = new FuelPump(this->tanks[9], 15000, false);  //17 - Right outer
+        this->pumps[18] = new FuelPump(this->tanks[10], 10000, false); //18 - Trim left
+        this->pumps[19] = new FuelPump(this->tanks[10], 10000, false); //19 - Trim right
+        this->pumps[20] = new FuelPump(this->tanks[7], 10000, false);  //20 - APU
 
 
 
@@ -478,5 +478,41 @@ namespace FuelSystem {
 
         this->tankValves[21]->setPower(powered); //Trim right valve
     }
+
+    int FuelSystem::readQuantity(int id) {
+        if (id == 11)
+            return this->tanks[1]->getCollectorFuel();
+        if (id == 12)
+            return this->tanks[4]->getCollectorFuel();
+        if (id == 13)
+            return this->tanks[5]->getCollectorFuel();
+        if (id == 14)
+            return this->tanks[8]->getCollectorFuel();
+        return this->tanks[id]->getFuel();
+    }
+
+    int FuelSystem::readValveState(int id) {
+        if (id <= 20)
+            return this->tankValves[id]->getState();
+        else
+            return this->busValves[id-30]->getState();
+    }
+
+    void FuelSystem::setValveState(int id, int state) {
+        if (id <= 21)
+            this->tankValves[id]->setState(state);
+        else
+            this->busValves[id-30]->setState(state);
+    }
+
+    int FuelSystem::readPumpState(int id) {
+        return this->pumps[id]->getState();
+    }
+
+    void FuelSystem::setPumpState(int id, int state) {
+        this->pumps[id]->setState(state);
+    }
+
+
 
 }

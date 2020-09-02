@@ -6,13 +6,14 @@
 
 
 namespace FuelSystem {
-    FuelSystem::FuelPump::FuelPump(FuelSystem::FuelTank* location, int rate) {
+    FuelSystem::FuelPump::FuelPump(FuelSystem::FuelTank* location, int rate, bool iF) {
         this->maxPumpRate = rate;
         this->pumpLocation = location;
         this->state = 0;
         this->isFailed = false;
         this->hasPower = false;
         this->commandedState = 0;
+        this->isFeed = iF;
     }
 
     int FuelPump::getPumpable() {
@@ -28,12 +29,15 @@ namespace FuelSystem {
 
     void FuelPump::pumpFuel(int amount) {
         // TODO check for addRemFuel not returning 0 (tank did not have enough fuel) (should not happen) (maybe it can, idk/c)
-        this->pumpLocation->removeFuel(amount);
+        if (this->isFeed)
+            this->pumpLocation->removeFuelCollector(amount);
+        else
+            this->pumpLocation->removeFuel(amount);
     }
 
     bool FuelPump::canPump() {
         // If pump is on and we have fuel in tank, return true
-        if (this->state == 1 && !this->pumpLocation->isEmpty()) {
+        if (this->state == 1 && !this->pumpLocation->isCollectorEmpty()) { //we can use isCollectorEmpty() because if the tank does not have collector this function is equal to isEmpty()
             return true;
         }
         return false;

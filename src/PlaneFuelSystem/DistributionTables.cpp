@@ -3,265 +3,71 @@
 //
 
 #include "DistributionTables.h"
+#include "Tables/Tables.h"
 #include <cstdlib>
+#include <cmath>
 
 namespace PlaneFuelSystem {
 
     DistributionTables::DistributionTables() {
-        this->ZFWs = (int*) malloc(4 * sizeof(int));
-        this->ZFWs[0] = 292500;
-        this->ZFWs[1] = 315000;
-        this->ZFWs[2] = 337500;
-        this->ZFWs[3] = 372000;
+        //PFQ = preselected fuel quantity = total fuel
 
-        this->PFQ = (int*) malloc(242 * sizeof(int));
-        this->PFQ[0] = 47000;
-        this->PFQ[1] = 48000;
-        this->PFQ[2] = 49000;
-        this->PFQ[3] = 50000;
-        this->PFQ[4] = 51000;
-        this->PFQ[5] = 52000;
-        this->PFQ[6] = 53000;
-        this->PFQ[7] = 54000;
-        this->PFQ[8] = 55000;
-        this->PFQ[9] = 56000;
-        this->PFQ[10] = 57000;
-        this->PFQ[11] = 58000;
-        this->PFQ[12] = 59000;
-        this->PFQ[13] = 60000;
-        this->PFQ[14] = 61000;
-        this->PFQ[15] = 62000;
-        this->PFQ[16] = 63000;
-        this->PFQ[17] = 64000;
-        this->PFQ[18] = 65000;
-        this->PFQ[19] = 66000;
-        this->PFQ[20] = 67000;
-        this->PFQ[21] = 68000;
-        this->PFQ[22] = 69000;
-        this->PFQ[23] = 70000;
-        this->PFQ[24] = 71000;
-        this->PFQ[25] = 72000;
-        this->PFQ[26] = 73000;
-        this->PFQ[27] = 74000;
-        this->PFQ[28] = 75000;
-        this->PFQ[29] = 76000;
-        this->PFQ[30] = 77000;
-        this->PFQ[31] = 78000;
-        this->PFQ[32] = 79000;
-        this->PFQ[33] = 80000;
-        this->PFQ[34] = 81000;
-        this->PFQ[35] = 82000;
-        this->PFQ[36] = 83000;
-        this->PFQ[37] = 84000;
-        this->PFQ[38] = 85000;
-        this->PFQ[39] = 86000;
-        this->PFQ[40] = 87000;
-        this->PFQ[41] = 88000;
-        this->PFQ[42] = 89000;
-        this->PFQ[43] = 90000;
-        this->PFQ[44] = 91000;
-        this->PFQ[45] = 92000;
-        this->PFQ[46] = 93000;
-        this->PFQ[47] = 94000;
-        this->PFQ[48] = 95000;
-        this->PFQ[49] = 96000;
-        this->PFQ[50] = 97000;
-        this->PFQ[51] = 98000;
-        this->PFQ[52] = 99000;
-        this->PFQ[53] = 100000;
-        this->PFQ[54] = 101000;
-        this->PFQ[55] = 102000;
-        this->PFQ[56] = 103000;
-        this->PFQ[57] = 104000;
-        this->PFQ[58] = 105000;
-        this->PFQ[59] = 106000;
-        this->PFQ[60] = 107000;
-        this->PFQ[61] = 108000;
-        this->PFQ[62] = 109000;
-        this->PFQ[63] = 110000;
-        this->PFQ[64] = 111000;
-        this->PFQ[65] = 112000;
-        this->PFQ[66] = 113000;
-        this->PFQ[67] = 114000;
-        this->PFQ[68] = 115000;
-        this->PFQ[69] = 116000;
-        this->PFQ[70] = 117000;
-        this->PFQ[71] = 118000;
-        this->PFQ[72] = 119000;
-        this->PFQ[73] = 120000;
-        this->PFQ[74] = 121000;
-        this->PFQ[75] = 122000;
-        this->PFQ[76] = 123000;
-        this->PFQ[77] = 124000;
-        this->PFQ[78] = 125000;
-        this->PFQ[79] = 126000;
-        this->PFQ[80] = 127000;
-        this->PFQ[81] = 128000;
-        this->PFQ[82] = 129000;
-        this->PFQ[83] = 130000;
-        this->PFQ[84] = 131000;
-        this->PFQ[85] = 132000;
-        this->PFQ[86] = 133000;
-        this->PFQ[87] = 134000;
-        this->PFQ[88] = 135000;
-        this->PFQ[89] = 136000;
-        this->PFQ[90] = 137000;
-        this->PFQ[91] = 138000;
-        this->PFQ[92] = 139000;
-        this->PFQ[93] = 140000;
-        this->PFQ[94] = 141000;
-        this->PFQ[95] = 142000;
-        this->PFQ[96] = 143000;
-        this->PFQ[97] = 144000;
-        this->PFQ[98] = 145000;
-        this->PFQ[99] = 146000;
-        this->PFQ[100] = 147000;
-        this->PFQ[101] = 148000;
-        this->PFQ[102] = 149000;
-        this->PFQ[103] = 150000;
-        this->PFQ[104] = 151000;
-        this->PFQ[105] = 152000;
-        this->PFQ[106] = 153000;
-        this->PFQ[107] = 154000;
-        this->PFQ[108] = 155000;
-        this->PFQ[109] = 156000;
-        this->PFQ[110] = 157000;
-        this->PFQ[111] = 158000;
-        this->PFQ[112] = 159000;
-        this->PFQ[113] = 160000;
-        this->PFQ[114] = 161000;
-        this->PFQ[115] = 162000;
-        this->PFQ[116] = 163000;
-        this->PFQ[117] = 164000;
-        this->PFQ[118] = 165000;
-        this->PFQ[119] = 166000;
-        this->PFQ[120] = 167000;
-        this->PFQ[121] = 168000;
-        this->PFQ[122] = 169000;
-        this->PFQ[123] = 170000;
-        this->PFQ[124] = 171000;
-        this->PFQ[125] = 172000;
-        this->PFQ[126] = 173000;
-        this->PFQ[127] = 174000;
-        this->PFQ[128] = 175000;
-        this->PFQ[129] = 176000;
-        this->PFQ[130] = 177000;
-        this->PFQ[131] = 178000;
-        this->PFQ[132] = 179000;
-        this->PFQ[133] = 180000;
-        this->PFQ[134] = 181000;
-        this->PFQ[135] = 182000;
-        this->PFQ[136] = 183000;
-        this->PFQ[137] = 184000;
-        this->PFQ[138] = 185000;
-        this->PFQ[139] = 186000;
-        this->PFQ[140] = 187000;
-        this->PFQ[141] = 188000;
-        this->PFQ[142] = 189000;
-        this->PFQ[143] = 190000;
-        this->PFQ[144] = 191000;
-        this->PFQ[145] = 192000;
-        this->PFQ[146] = 193000;
-        this->PFQ[147] = 194000;
-        this->PFQ[148] = 195000;
-        this->PFQ[149] = 196000;
-        this->PFQ[150] = 197000;
-        this->PFQ[151] = 198000;
-        this->PFQ[152] = 199000;
-        this->PFQ[153] = 200000;
-        this->PFQ[154] = 201000;
-        this->PFQ[155] = 202000;
-        this->PFQ[156] = 203000;
-        this->PFQ[157] = 204000;
-        this->PFQ[158] = 205000;
-        this->PFQ[159] = 206000;
-        this->PFQ[160] = 207000;
-        this->PFQ[161] = 208000;
-        this->PFQ[162] = 209000;
-        this->PFQ[163] = 210000;
-        this->PFQ[164] = 211000;
-        this->PFQ[165] = 212000;
-        this->PFQ[166] = 213000;
-        this->PFQ[167] = 214000;
-        this->PFQ[168] = 215000;
-        this->PFQ[169] = 216000;
-        this->PFQ[170] = 217000;
-        this->PFQ[171] = 218000;
-        this->PFQ[172] = 219000;
-        this->PFQ[173] = 220000;
-        this->PFQ[174] = 221000;
-        this->PFQ[175] = 222000;
-        this->PFQ[176] = 223000;
-        this->PFQ[177] = 224000;
-        this->PFQ[178] = 225000;
-        this->PFQ[179] = 226000;
-        this->PFQ[180] = 227000;
-        this->PFQ[181] = 228000;
-        this->PFQ[182] = 229000;
-        this->PFQ[183] = 230000;
-        this->PFQ[184] = 231000;
-        this->PFQ[185] = 232000;
-        this->PFQ[186] = 233000;
-        this->PFQ[187] = 234000;
-        this->PFQ[188] = 235000;
-        this->PFQ[189] = 236000;
-        this->PFQ[190] = 237000;
-        this->PFQ[191] = 238000;
-        this->PFQ[192] = 239000;
-        this->PFQ[193] = 240000;
-        this->PFQ[194] = 241000;
-        this->PFQ[195] = 242000;
-        this->PFQ[196] = 243000;
-        this->PFQ[197] = 244000;
-        this->PFQ[198] = 245000;
-        this->PFQ[199] = 246000;
-        this->PFQ[200] = 247000;
-        this->PFQ[201] = 248000;
-        this->PFQ[202] = 249000;
-        this->PFQ[203] = 250000;
-        this->PFQ[204] = 251000;
-        this->PFQ[205] = 252000;
-        this->PFQ[206] = 253000;
-        this->PFQ[207] = 254000;
-        this->PFQ[208] = 255000;
-        this->PFQ[209] = 256000;
-        this->PFQ[210] = 257000;
-        this->PFQ[211] = 258000;
-        this->PFQ[212] = 259000;
-        this->PFQ[213] = 260000;
-        this->PFQ[214] = 261000;
-        this->PFQ[215] = 262000;
-        this->PFQ[216] = 263000;
-        this->PFQ[217] = 264000;
-        this->PFQ[218] = 265000;
-        this->PFQ[219] = 266000;
-        this->PFQ[220] = 267000;
-        this->PFQ[221] = 268000;
-        this->PFQ[222] = 269000;
-        this->PFQ[223] = 270000;
-        this->PFQ[224] = 271000;
-        this->PFQ[225] = 272000;
-        this->PFQ[226] = 273000;
-        this->PFQ[227] = 274000;
-        this->PFQ[228] = 275000;
-        this->PFQ[229] = 276000;
-        this->PFQ[230] = 277000;
-        this->PFQ[231] = 278000;
-        this->PFQ[232] = 279000;
-        this->PFQ[233] = 280000;
-        this->PFQ[234] = 281000;
-        this->PFQ[235] = 282000;
-        this->PFQ[236] = 283000;
-        this->PFQ[237] = 284000;
-        this->PFQ[238] = 285000;
-        this->PFQ[239] = 286000;
-        this->PFQ[240] = 287000;
-        this->PFQ[241] = 288000;
-        this->PFQ[242] = 289000;
-        this->PFQ[243] = 290000;
+        // trimFuel[x][y][z] -> x=weight class; y=ZFCG class; z=PFQ class
+        this->trimFuel = (int***) malloc(4*sizeof(int**));
+        for (int i = 0; i < 4; i++) {
+            this->trimFuel[i] = (int**) malloc(15 * sizeof(int *));
+            for (int j = 0; j < 15; j++) {
+                this->trimFuel[i][j] = (int*) malloc(244 * sizeof(int));
+            }
+        }
 
-
-
-
+        populateT0(this->trimFuel);
+        populateT1(this->trimFuel);
+        populateT2(this->trimFuel);
+        populateT3(this->trimFuel);
     }
+
+    int DistributionTables::calculateWeightIndex(int ZFW) {
+        if (ZFW < 270000)
+            return -1;
+        if (ZFW <= 292500)
+            return 0;
+        if (ZFW <= 315000)
+            return 1;
+        if (ZFW <= 337500)
+            return 2;
+        return 3;
+    }
+
+    int DistributionTables::calculateZFCGClass(double CG) {
+        int roundCG = (int) std::round(CG);
+
+        if (roundCG < 29 || roundCG > 43)
+            return -1;
+        return roundCG-29;
+    }
+
+    int DistributionTables::calculatePFQClass(int PFQ) {
+        //round PFQ to the thousands
+        PFQ = PFQ + 500; //to make 47600 = 48000 and not 47000
+        PFQ = (PFQ / 1000) * 1000;
+        if (PFQ <= 47000)
+            return 0;
+        if (PFQ > 290000)
+            PFQ = 290000;
+        return (PFQ-47000)/1000;
+    }
+
+    int DistributionTables::calculateTrimFuel(int cPFQ) {
+        return this->calculateTrimFuel(282000, cPFQ, 36.5);
+    }
+
+    int DistributionTables::calculateTrimFuel(int ZFW, int cPFQ, double ZFCG) {
+        int table = this->calculateWeightIndex(ZFW);
+        int ZFCGClass = this->calculateZFCGClass(ZFCG);
+        int PFQClass = this->calculatePFQClass(cPFQ);
+
+        return this->trimFuel[table][ZFCGClass][PFQClass];
+    }
+
 }

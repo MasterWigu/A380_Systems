@@ -8,12 +8,15 @@
 namespace PlaneFuelSystem {
     class DistributionTables {
     private:
-        int* ZFWs;
-        int* PFQ;
         int*** trimFuel;
 
+        static int calculateWeightIndex(int ZFW);
+        static int calculateZFCGClass(double CG);
+        static int calculatePFQClass(int PFQ);
     public:
         DistributionTables();
+        int calculateTrimFuel(int ZFW, int cPFQ, double ZFCG);
+        int calculateTrimFuel(int cPFQ);
     };
 }
 
