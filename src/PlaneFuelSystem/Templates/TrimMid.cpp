@@ -48,12 +48,10 @@ bool **PlaneFuelSystem::TrimMid::getTemplate(const int* tanks, bool *pmpFailures
         return this->output;
     }
     if (cases[7] && aut) {
-        //TODO failure
-        return this->output;
+        //when we have general failure, no automatic should happen
+        return nullptr;
     }
 
-    //TODO manual mode
-
-
-    return this->output;
+    //this transfer is impossible in manual mode
+    return nullptr;
 }

@@ -15,7 +15,7 @@ namespace PlaneFuelSystem {
         OutFeeds();
         ~OutFeeds();
 
-        bool **getTemplate(const int *tanks, bool *pmpFailures, bool *vlvFailures, const bool *cases, bool aut, bool someManual);
+        bool **getTemplate(const int *tanks, int *pmpFailures, int *vlvFailures, const bool *cases, bool aut, bool someManual);
     };
 }
 

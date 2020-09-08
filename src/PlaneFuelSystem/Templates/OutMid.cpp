@@ -40,18 +40,18 @@ bool **PlaneFuelSystem::OutMid::getTemplate(const int* tanks, bool *pmpFailures,
     }
     if ((cases[1] || cases[5]) && !cases[7] ) {//all transfers on aft or grav from outer (uses fwd)
         //We should never have transfers out->mid if case 2 or case 5 are active
-        return this->output;
+        return nullptr;
     }
     if (cases[7] && aut) {
-        //TODO failure
-        return this->output;
+        //when we have general failure, no automatic should happen
+        return nullptr;
     }
 
     if (cases[7] && !aut) {
         //Out->mid is impossible in manual mode, should never happen
-        return this->output;
+        return nullptr;
     }
 
 
-    return this->output;
+    return nullptr;
 }

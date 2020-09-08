@@ -33,6 +33,7 @@ namespace PlaneFuelSystem {
 
         int* vlvsFailStates;
         int* pumpsFailStates;
+        int* consValvesFailStates;
         bool* pumpsCockpitButtons;
         bool* xfrCockpitButtons;
         bool* crossFeedCockpit;

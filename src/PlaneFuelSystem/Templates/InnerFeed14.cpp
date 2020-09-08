@@ -31,14 +31,14 @@ bool **PlaneFuelSystem::InnerFeed14::getTemplate(const int* tanks, bool *pmpFail
     if (tanks[8] > tanks[1] + 50) //if tank1 has more than tank8
         f8 = false;
 
-    if (!cases[2] && !cases[3] && !cases[7]) { //all normal, oh yes
+    if (!cases[1] && !cases[3] && !cases[7]) { //all normal, oh yes
         if (f1) this->valveStates[2] = true;
         if (f8) this->valveStates[16] = true;
         this->pumpStates[11] = true;
         this->pumpStates[13] = true;
         return this->output;
     }
-    if ((cases[2] || cases[3]) && !cases[7] ) {//all transfers on aft or gallery swap for inner (uses aft)
+    if ((cases[1] || cases[3]) && !cases[7] ) {//all transfers on aft or gallery swap for inner (uses aft)
         if (f1) this->valveStates[3] = true;
         if (f8) this->valveStates[17] = true;
         this->pumpStates[12] = true;
@@ -46,12 +46,9 @@ bool **PlaneFuelSystem::InnerFeed14::getTemplate(const int* tanks, bool *pmpFail
         return this->output;
     }
     if (cases[7] && aut) {
-        //TODO failure
-        return this->output;
+        //Should not happen
+        return nullptr;
     }
 
-    //TODO manual mode
-
-
-    return this->output;
+    return nullptr;
 }

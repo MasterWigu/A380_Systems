@@ -46,12 +46,9 @@ bool **PlaneFuelSystem::InnerOuter::getTemplate(const int* tanks, bool *pmpFailu
         return this->output;
     }
     if (cases[7] && aut) {
-        //TODO failure
-        return this->output;
+        //Should not happen
+        return nullptr;
     }
 
-    //TODO manual mode
-
-
-    return this->output;
+    return nullptr;
 }

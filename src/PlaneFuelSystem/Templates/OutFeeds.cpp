@@ -19,7 +19,7 @@ PlaneFuelSystem::OutFeeds::~OutFeeds() {
     free(this->output);
 }
 
-bool **PlaneFuelSystem::OutFeeds::getTemplate(const int* tanks, bool *pmpFailures, bool *vlvFailures, const bool *cases, bool aut, bool someManual) {
+bool **PlaneFuelSystem::OutFeeds::getTemplate(const int* tanks, int *pmpFailures, int *vlvFailures, const bool *cases, bool aut, bool someManual) {
     for (int i = 0; i < 40; i++) this->valveStates[i] = false;
     for (int i = 0; i< 21; i++) this->pumpStates[i] = false;
 
@@ -45,7 +45,18 @@ bool **PlaneFuelSystem::OutFeeds::getTemplate(const int* tanks, bool *pmpFailure
         this->pumpStates[17] = true;
         return this->output;
     }
-    if ((cases[1] || cases[5]) && !cases[7] && aut) {//case 5 - gravFromOuterTanks (automatic) or case 2- all on aft
+    if (cases[1] && !cases[5] && !cases[7]) {//case 2- all on aft
+        if (f1) this->valveStates[3] = true;
+        if (f8) this->valveStates[17] = true;
+        if (f4) this->valveStates[9] = true;
+        if (f5) this->valveStates[11] = true;
+        if (f1 || f8 || f4 || f5) {
+            this->valveStates[1] = true;
+            this->valveStates[19] = true;
+        }
+        return this->output;
+    }
+    if (!cases[1] && cases[5] && !cases[7] && aut) {//case 5 - gravFromOuterTanks (automatic)
         if (f1) this->valveStates[2] = true;
         if (f8) this->valveStates[16] = true;
         if (f1 || f8) {
@@ -62,12 +73,12 @@ bool **PlaneFuelSystem::OutFeeds::getTemplate(const int* tanks, bool *pmpFailure
         return this->output;
     }
     if (cases[7] && aut) {
-        //TODO failure
-        return this->output;
+        //this should not happen
+        return nullptr;
     }
 
     if (cases[5] && !cases[7] && !aut && !someManual) {//case 5 - gravFromOuterTanks (manual)
-        if (f4) this->valveStates[8] = true;
+        if (f4) this->valveStates[8] = true; //todo is correct?
         if (f4) this->valveStates[9] = true;
         if (f5) this->valveStates[10] = true;
         if (f5) this->valveStates[11] = true;
@@ -90,12 +101,10 @@ bool **PlaneFuelSystem::OutFeeds::getTemplate(const int* tanks, bool *pmpFailure
     }
 
     if (cases[7] && aut) {
-        //TODO failure
-        return this->output;
+        //should never happen
+        return nullptr;
     }
 
     //TODO manual mode
-
-
-    return this->output;
+    return nullptr;
 }

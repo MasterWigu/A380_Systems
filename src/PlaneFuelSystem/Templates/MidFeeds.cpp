@@ -19,7 +19,7 @@ PlaneFuelSystem::MidFeeds::~MidFeeds() {
     free(this->output);
 }
 
-bool **PlaneFuelSystem::MidFeeds::getTemplate(const int* tanks, bool *pmpFailures, bool *vlvFailures, const bool *cases, bool aut) {
+bool **PlaneFuelSystem::MidFeeds::getTemplate(const int* tanks, int *pmpFailures, int *vlvFailures, const bool *cases, bool aut) {
     for (int i = 0; i < 40; i++) this->valveStates[i] = false;
     for (int i = 0; i< 21; i++) this->pumpStates[i] = false;
 
@@ -55,12 +55,12 @@ bool **PlaneFuelSystem::MidFeeds::getTemplate(const int* tanks, bool *pmpFailure
         return this->output;
     }
     if (cases[7] && aut) {
-        //TODO failure
-        return this->output;
+        //should never happen
+        return nullptr;
     }
 
-    //TODO manual mode
+    //TODO hell mode
 
 
-    return this->output;
+    return nullptr;
 }

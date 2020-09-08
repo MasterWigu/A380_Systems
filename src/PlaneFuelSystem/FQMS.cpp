@@ -4,7 +4,6 @@
 #include <cstdlib>
 #include "FQMS.h"
 
-//TODO GENERAL confirm cases on all templates
 namespace PlaneFuelSystem {
     FQMS::FQMS(FuelSystem::FuelSystem* fS, PlaneFuelSystem::FQDC* f) {
         this->fuelSystem = fS;
@@ -57,6 +56,10 @@ namespace PlaneFuelSystem {
         for (int i = 0; i < 40; i++)
             this->vlvsFailStates[i] = 0;
 
+        this->consValvesFailStates = (int*) malloc(7*sizeof(int));
+        for (int i = 0; i < 7; i++)
+            this->consValvesFailStates[i] = 0;
+
         this->commandedAutoTransfers = (bool*) malloc(sizeof(bool));
 
 
@@ -80,14 +83,14 @@ namespace PlaneFuelSystem {
             tempCases[i] = false;
 
         //CASE 1
-        //TODO jettison valves
         if (this->vlvsFailStates[1] == 1 || this->vlvsFailStates[19] == 1 || //out    tk aft vlvs
             this->vlvsFailStates[5] != 0 || this->vlvsFailStates[15] != 0 || //mid    tk aft vlvs
             this->vlvsFailStates[7] != 0 || this->vlvsFailStates[13] != 0 || //inn    tk aft vlvs
             this->vlvsFailStates[3] != 0 || this->vlvsFailStates[17] != 0 || //feed14 tk aft vlvs
             this->vlvsFailStates[9] != 0 || this->vlvsFailStates[11] != 0 || //feed23 tk aft vlvs
             this->vlvsFailStates[38] == 2 || //trim to aft vlv
-            this->vlvsFailStates[37] == 1) { //trim to fwd vlv
+            this->vlvsFailStates[37] == 1 || //trim to fwd vlv
+            this->consValvesFailStates[5] == 1 || this->consValvesFailStates[6] == 1) { //jettison valves
 
 
             tempCases[0] = true;
@@ -130,7 +133,15 @@ namespace PlaneFuelSystem {
         }
 
         //check conflicting cases (if we have any, declare general fault (pseudo case 7)
-        //TODO check conflicting cases
+        if (tempCases[0] && tempCases[1] || //all on fwd && all on aft
+            tempCases[0] && tempCases[2] || //all on fwd && to out on aft
+            tempCases[0] && tempCases[3] || //all on fwd && swap for inn
+            tempCases[0] && tempCases[4] || //all on fwd && swap for mid
+            tempCases[0] && tempCases[5] || //all on fwd && grav trans from out (needs both galleries)
+            tempCases[1] && tempCases[5] ) {//all on aft && grav trans from out (needs both galleries)
+
+            tempCases[7] = true;
+        }
 
     }
 
@@ -161,8 +172,6 @@ namespace PlaneFuelSystem {
     //                    11 - Outer  -> Inner
     //                    12 - Outer  -> Mid
     //                    (6 - Outer  -> Feeds)
-
-
 
 
 
@@ -203,10 +212,15 @@ namespace PlaneFuelSystem {
         this->pumpStatusCheck();
         this->vlvStatusCheck();
         this->getTankLevels();
+        this->detectAbnCases();
         this->checkMainTransfers(remMinutes);
 
         this->applyState();
     }
+
+    void FQMS::
+
+
 
     void FQMS::checkMainTStart() {
         bool needsTransfer = false;
