@@ -28,6 +28,24 @@ namespace PlaneFuelSystem {
 
         int* tankLevels;
 
+        bool* commandedVlvStates;
+        bool* commandedPumpStates;
+
+        int* vlvsFailStates;
+        int* pumpsFailStates;
+        bool* pumpsCockpitButtons;
+        bool* xfrCockpitButtons;
+        bool* crossFeedCockpit;
+        bool emergValvesCockpit;
+
+        bool* commandedAutoTransfers;
+        bool* commandedManualTransfers;
+
+        void arraysInit();
+
+        void pumpStatusCheck();
+        void vlvStatusCheck();
+
         void getTankLevels();
         void updateThresholds(int remainMinutes);
         void checkMainTStart();
@@ -38,6 +56,14 @@ namespace PlaneFuelSystem {
         FQMS(FuelSystem::FuelSystem *fS, FQDC *f);
 
         void updateLoop(int remMinutes);
+
+        void applyState();
+
+        void applyPumpState();
+
+        void applyValveState();
+
+        void detectAbnCases();
     };
 }
 

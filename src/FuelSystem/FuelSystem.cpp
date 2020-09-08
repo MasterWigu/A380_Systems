@@ -492,6 +492,8 @@ namespace FuelSystem {
     }
 
     int FuelSystem::readValveState(int id) {
+        if (id == 28 || id == 29)
+            return this->emergValves[id-28]->getState();
         if (id <= 20)
             return this->tankValves[id]->getState();
         else
@@ -499,6 +501,8 @@ namespace FuelSystem {
     }
 
     void FuelSystem::setValveState(int id, int state) {
+        if (id == 28 || id == 29)
+            this->emergValves[id-28]->setState(state);
         if (id <= 21)
             this->tankValves[id]->setState(state);
         else
