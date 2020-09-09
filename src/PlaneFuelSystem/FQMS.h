@@ -11,8 +11,6 @@
 namespace PlaneFuelSystem {
     class FQMS {
     private:
-        int threshold14;
-        int threshold23;
         int* feedTks;
 
         FuelSystem::FuelSystem* fuelSystem;
@@ -50,33 +48,22 @@ namespace PlaneFuelSystem {
 
         void pumpStatusCheck();
         void vlvStatusCheck();
-
         void getTankLevels();
-        void updateThresholds(int remainMinutes);
-        void checkMainTStart();
-        void checkMainTStop();
-        void checkMainTransfers(int remMinutes);
+
+        void updateCGTarget(int GW);
+        void detectAbnCases();
+
+        void selectTransfers(int remFltTime, double currCG);
+        void selectNormalTransfers(int remTimeMins, double currCG);
+
+        void applyState();
+        void applyPumpState();
+        void applyValveState();
 
     public:
         FQMS(FuelSystem::FuelSystem *fS, FQDC *f);
 
-        void updateLoop(int remMinutes);
-
-        void applyState();
-
-        void applyPumpState();
-
-        void applyValveState();
-
-        void detectAbnCases();
-
-        void selectTransfers();
-
-        void selectNormalTransfers();
-
-        void selectNormalTransfers(int remTimeMins);
-
-        void selectNormalTransfers(int remTimeMins, double currCG);
+        void updateLoop(int remMinutes, int GW, double currCG);
     };
 }
 

@@ -14,8 +14,6 @@ namespace PlaneFuelSystem {
         this->fwdOccupied = false;
         this->aftOccupied = false;
 
-        this->threshold14 = 19560;
-        this->threshold23 = 20840;
         this->feedTks = (int *) malloc(4 * sizeof(int));
         this->feedTks[0] = 1; this->feedTks[1] = 4;this->feedTks[2] = 5;this->feedTks[3] = 8;
 
@@ -182,12 +180,13 @@ namespace PlaneFuelSystem {
     //                    13 - Outer    -> Feeds
     //                    14 - ALL      -> Jettison
 
-    void FQMS::updateLoop(int remMinutes) {
+    void FQMS::updateLoop(int remMinutes, int GW, double currCG) {
+        this->updateCGTarget(GW);
         this->pumpStatusCheck();
         this->vlvStatusCheck();
         this->getTankLevels();
         this->detectAbnCases();
-        this->checkMainTransfers(remMinutes);
+        this->selectTransfers(remMinutes, currCG);
 
         this->applyState();
     }
@@ -197,21 +196,21 @@ namespace PlaneFuelSystem {
         this->CGTarget = (5058.4908643318586 + sqrt(25588329.824528873888 - 253.782771599910176 * (101088.31599889736 - GW))) / 126.891385799955088;
     }
 
-    void FQMS::selectTransfers() {
+    void FQMS::selectTransfers(int remFltTime, double currCG) {
         if (this->abnCases[7])
             return; //if we are have too many failures, no automatic transfers are possible
         if (this->abnCases[0]) {
-            this->selectCase1Transfers();
+            //this->selectCase1Transfers();
+            return;
         }
         if (this->abnCases[1]) {
-            this->selectCase2Transfers();
+            //this->selectCase2Transfers();
             return;
         }
         if (this->abnCases[6]) {
-            this->selectCase6Transfers();
-            return;
+            //this->selectCase6Transfers();
         }
-        this->selectNormalTransfers();
+        this->selectNormalTransfers(remFltTime, currCG);
 
     }
 
@@ -321,153 +320,38 @@ namespace PlaneFuelSystem {
                 this->commandedTransfers[13] = true;
                 fwdOccupied = true;
             }
-            else if (this->tankLevels[2]+this->tankLevels[7] < 57200) { //if mids not empty
+            else if (this->tankLevels[2]+this->tankLevels[7] < 57200) { //if mids not full
                 this->commandedTransfers[12] = true;
                 fwdOccupied = true;
             }
-            else if (this->tankLevels[3]+ this->tankLevels[6] < 72400) { //if inners not empty
+            else if (this->tankLevels[3]+ this->tankLevels[6] < 72400) { //if inners not full
                 this->commandedTransfers[11] = true;
                 fwdOccupied = true;
             }
         }
 
         //CG TRANSFERS from trim
-        if (currCG > this->CGTarget || ((this->lastTransfers[8] || this->lastTransfers[9] || this->lastTransfers[10]) && currCG > CGTarget - 1)) {
-            //TODO see if conditions about tanks are correct
-        }
-
-
-    }
-
-
-
-    void FQMS::checkMainTStart() {
-        bool needsTransfer = false;
-        if (fwdTransferInProgress != 1 && aftTransferInProgress != 1) {//if we are not making any main transfer
-            if (this->tankLevels[1] < this->threshold14) {
-                this->mainTransferDest[0] = true;
-                needsTransfer = true;
-            }
-            if (this->tankLevels[4] < this->threshold23) {
-                this->mainTransferDest[1] = true;
-                needsTransfer = true;
-            }
-            if (this->tankLevels[5] < this->threshold23) {
-                this->mainTransferDest[2] = true;
-                needsTransfer = true;
-            }
-            if (this->tankLevels[8] < this->threshold14) {
-                this->mainTransferDest[3] = true;
-                needsTransfer = true;
-            }
-        }
-        else if (fwdTransferInProgress == 1 || aftTransferInProgress == 1) { //if we are already making main transfer
-            needsTransfer = true;
-            bool equalThresholds = this->threshold14 == this->threshold23; //to see if we have to balance the 4 feeds, or by the pair
-            if (equalThresholds) {
-                int lower = 400000;
-                for (int i = 0; i<4;i++)
-                    if (this->mainTransferDest[i] && this->tankLevels[this->feedTks[i]] < lower)
-                        lower = this->tankLevels[this->feedTks[i]];
-
-                for (int i = 0; i<4;i++)
-                    if (this->tankLevels[this->feedTks[i]] < lower)
-                        this->mainTransferDest[i] = true;
-            }
-            else {
-                int lower;
-                int indexes[4] = {0, 3, 1, 2};
-                for (int j = 0; j<2; j++) {
-                    lower = 400000;
-                    for (int i = 0; i < 2; i++)
-                        if (this->mainTransferDest[indexes[2*j + i]] && this->tankLevels[this->feedTks[indexes[2*j + i]]] < lower)
-                            lower = this->tankLevels[this->feedTks[indexes[2*j + i]]];
-
-                    for (int i = 0; i < 2; i++)
-                        if (this->tankLevels[this->feedTks[indexes[2*j + i]]] < lower)
-                            this->mainTransferDest[indexes[2*j + i]] = true;
+        if (!aftOccupied && currCG > this->CGTarget || ((this->lastTransfers[8] || this->lastTransfers[9] || this->lastTransfers[10]) && currCG > CGTarget - 1)) {
+            if (this->tankLevels[3]+ this->tankLevels[6] > 250) { //if inners not empty
+                if (this->tankLevels[3]+ this->tankLevels[6] < 72400) {
+                    this->commandedTransfers[8] = true;
+                    aftOccupied = true;
                 }
             }
-
-        }
-
-        if (needsTransfer) { //if transfer is needed, we need to check which tank
-            this->mainTransferSrc[0] = false; this->mainTransferSrc[1] = false; this->mainTransferSrc[2] = false; this->mainTransferSrc[3] = false;
-            if (this->fwdTransferInProgress == 1) this->fwdTransferInProgress = 0;
-            if (this->aftTransferInProgress == 1) this->aftTransferInProgress = 0;
-
-            if (this->tankLevels[3] + this->tankLevels[6] > 200) {
-                this->mainTransferSrc[0] = true;
-                this->fwdTransferInProgress = 1;
-            }
-            else if (this->tankLevels[2] + this->tankLevels[7] > 200) {
-                this->mainTransferSrc[2] = true;
-                this->fwdTransferInProgress = 1;
-            }
-            else if (this->tankLevels[10] > 200) {
-                this->mainTransferSrc[3] = true;
-                this->aftTransferInProgress = 1;
-            }
-            else if (this->tankLevels[0] + this->tankLevels[9] > 200) {
-                this->mainTransferSrc[4] = true;
-                this->fwdTransferInProgress = 1;
-            }
-        }
-    }
-
-    void FQMS::checkMainTStop() {
-        // we dont have to stop because of src empty, the start function will change the src automatically, or terminate if no src is avail
-
-        if (fwdTransferInProgress != 1 && aftTransferInProgress != 1) {//if we are not making any main transfer
-            return;
-        }
-
-        bool stop = false;
-        if (this->threshold14 == this->threshold23) {
-            if (fwdTransferInProgress == 1) { //if is NOT trim transfer
-                for (int i = 0; i < 4; i++) {
-                    if (this->tankLevels[this->feedTks[i]] > threshold14 + 1000)
-                        stop = true;
-                }
-                if (stop) {
-                    fwdTransferInProgress = 0;
-                    for (int i = 0; i < 4; i++) {
-                        this->mainTransferSrc[i] = false;
-                        this->mainTransferDest[i] = false;
-                    }
+            else if (this->tankLevels[2]+this->tankLevels[7] > 250) { //if mids not empty
+                if (this->tankLevels[2]+this->tankLevels[7] < 57200) {
+                    this->commandedTransfers[9] = true;
+                    aftOccupied = true;
                 }
             }
-        }
-        else { //if thresholds are different
-            if (fwdTransferInProgress == 1) { //if is NOT trim transfer
-                int indexes[4] = {0, 3, 1, 2};
-                bool stop2[2] = {false, false};
-
-                for (int j = 0; j < 2; j++) {
-
-                    for (int i = 0; i < 2; i++) {
-                        if (this->tankLevels[this->feedTks[indexes[2*j+i]]] > threshold14 + 1000)
-                            stop2[j] = true;
-                    }
-                    if (stop2[j]) {
-                        for (int i = 0; i < 2; i++) {
-                            this->mainTransferDest[indexes[2*j+i]] = false;
-                        }
-                    }
-                }
-                if (stop2[0] && stop2[1]) { //only if both pairs of feed tanks are full, we stop the main transfer
-                    fwdTransferInProgress = 0;
-                    for (int i = 0; i < 4; i++)
-                        this->mainTransferSrc[i] = false;
-                }
+            else if (this->tankLevels[1]+this->tankLevels[4]+this->tankLevels[5]+this->tankLevels[8] < 89400) { //if feeds not full
+                this->commandedTransfers[10] = true;
+                aftOccupied = true;
             }
         }
-    }
 
-    void FQMS::checkMainTransfers(int remMinutes) {
-        this->updateThresholds(remMinutes);
-        this->checkMainTStop();
-        this->checkMainTStart();
+        //COLD AUTOMATIC TRANSFER
+        //TODO when temp is simulated
     }
 
     void FQMS::getTankLevels() {
@@ -512,40 +396,6 @@ namespace PlaneFuelSystem {
             this->tankLevels[i] = fqdcRead[i];
             this->FOB += fqdcRead[i];
         }
-    }
-
-    void FQMS::updateThresholds(int remainMinutes) {
-
-        if (this->tankLevels[3] + this->tankLevels[6] > 200 ||  //if transfer is from inner tanks
-                this->tankLevels[2] + this->tankLevels[7] > 8000) { //or from mid tanks with more than 8000kg
-            if (remainMinutes > 90) {
-                this->threshold14 = 19560;
-                this->threshold23 = 20840;
-                return;
-            }else {
-                this->threshold14 = 16560;
-                this->threshold23 = 17840;
-                return;
-            }
-        }
-
-        if (this->tankLevels[2] + this->tankLevels[7] > 200) { //if transfer is from mid tanks (with less than 8000kg)
-            this->threshold14 = 19560;
-            this->threshold23 = 19560;
-            return;
-        }
-        if (this->tankLevels[10] > 200) { //if transfer is from trim tank
-            this->threshold14 = 6000;
-            this->threshold23 = 6000;
-            return;
-        }
-        if (this->tankLevels[0] + this->tankLevels[9] > 100) { //if transfer is from outer tanks
-            this->threshold14 = 4000;
-            this->threshold23 = 4000;
-            return;
-        }
-        this->threshold14 = 4000000; //if all tanks are empty, dont start any more transfers
-        this->threshold23 = 4000000;
     }
 
     void FQMS::pumpStatusCheck() {
