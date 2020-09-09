@@ -18,8 +18,8 @@ namespace PlaneFuelSystem {
         FuelSystem::FuelSystem* fuelSystem;
         PlaneFuelSystem::FQDC* fqdc;
 
-        int fwdTransferInProgress;
-        int aftTransferInProgress;
+        bool fwdOccupied;
+        bool aftOccupied;
 
         bool* mainTransferDest;
         bool* mainTransferSrc;
@@ -39,8 +39,12 @@ namespace PlaneFuelSystem {
         bool* crossFeedCockpit;
         bool emergValvesCockpit;
 
-        bool* commandedAutoTransfers;
-        bool* commandedManualTransfers;
+        bool* commandedTransfers;
+        bool* lastTransfers;
+
+        bool inFlight;
+        int FOB;
+        double CGTarget;
 
         void arraysInit();
 
@@ -65,6 +69,14 @@ namespace PlaneFuelSystem {
         void applyValveState();
 
         void detectAbnCases();
+
+        void selectTransfers();
+
+        void selectNormalTransfers();
+
+        void selectNormalTransfers(int remTimeMins);
+
+        void selectNormalTransfers(int remTimeMins, double currCG);
     };
 }
 

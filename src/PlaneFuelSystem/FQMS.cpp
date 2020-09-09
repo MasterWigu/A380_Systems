@@ -2,6 +2,7 @@
 // Created by morei on 01/09/2020.
 //
 #include <cstdlib>
+#include <cmath>
 #include "FQMS.h"
 
 namespace PlaneFuelSystem {
@@ -10,8 +11,8 @@ namespace PlaneFuelSystem {
         this->fqdc = f;
         this->arraysInit();
 
-        this->fwdTransferInProgress = -1;
-        this->aftTransferInProgress = -1;
+        this->fwdOccupied = false;
+        this->aftOccupied = false;
 
         this->threshold14 = 19560;
         this->threshold23 = 20840;
@@ -19,6 +20,9 @@ namespace PlaneFuelSystem {
         this->feedTks[0] = 1; this->feedTks[1] = 4;this->feedTks[2] = 5;this->feedTks[3] = 8;
 
         this->emergValvesCockpit = false;
+
+        this->inFlight = false;
+        this->CGTarget = 0;
     }
 
     void FQMS::arraysInit() {
@@ -60,9 +64,13 @@ namespace PlaneFuelSystem {
         for (int i = 0; i < 7; i++)
             this->consValvesFailStates[i] = 0;
 
-        this->commandedAutoTransfers = (bool*) malloc(sizeof(bool));
+        this->commandedTransfers = (bool*) malloc(15 * sizeof(bool));
+        for (int i = 0; i < 15; i++)
+            this->commandedTransfers[i] = false;
 
-
+        this->lastTransfers = (bool*) malloc(15 * sizeof(bool));
+        for (int i = 0; i < 15; i++)
+            this->lastTransfers[i] = false;
 
         this->pumpsCockpitButtons = (bool*) malloc(20 * sizeof(bool));
         for (int i = 0; i < 20; i++)
@@ -157,56 +165,22 @@ namespace PlaneFuelSystem {
     //       6 - Case 6
     //       7 - Multiple failures (ignores other cases, this is sparta now)
 
-    //commandedTransfers: 0  - Inner  -> Feed14
-    //                    1  - Inner  -> Feed23
-    //                    2  - Mid+8t -> Feed14
-    //                    3  - Mid+8t -> Feed23
-    //                    4  - Mid-8t -> Feeds
-    //                    5  - Trim   -> Feeds
-    //                    6  - Outer  -> Feeds
-    //                    7  - Inner  -> Outer
-    //                    8  - Mid    -> Outer
-    //                    9  - Trim   -> Inner
-    //                    10 - Trim   -> Mid
-    //                    (5 - Trim   -> Feeds)
-    //                    11 - Outer  -> Inner
-    //                    12 - Outer  -> Mid
-    //                    (6 - Outer  -> Feeds)
 
-
-
-    //Possible transfers: 1 - Main           - Inner  -> Feed  (fwd)
-    //                    2 - Main           - Mid    -> Feed  (fwd)
-
-    //                    3- Main/Load/CG   - Trim   -> Feed  (aft)
-    //                    4- Load/CG        - Trim   -> Mid   (aft)
-    //                    5- Load/CG        - Trim   -> Inner (aft)
-    //                    6- Main/Load/Cold - Outer  -> Feed  (fwd)
-    //                    7- Load/Cold      - Outer  -> Mid   (fwd)
-    //                    8- Load/Cold      - Outer  -> Inner (fwd)
-    //                    9 - Load           - Inner  -> Outer (fwd)
-    //                    10 - Load           - Mid    -> Outer (fwd)
-    //                    11- Inb.           - Inner  -> Inner (fwd)
-    //                    12- Inb.           - Mid    -> Mid   (fwd)
-    //                    13- Inb.           - Outer  -> Outer (fwd)
-
-
-
-
-    //                    15- Manual         - Outer  -> Feeds  (fwd)
-    //                    15- Manual (grav)  - Outer  -> Feeds (fwd + aft) or (fwd)
-    //                    15- Manual         - Trim   -> Inner  (aft)
-    //                    15- Manual (grav)  - Trim   -> Inner  (aft)
-    //                    15- Manual         - Inner  -> Feeds  (aft)
-    //                    15- Manual         - Mid    -> Feeds  (aft)
-
-    //                    15- Manual (Jett.) - All    -> Jetti. (fwd + aft) - stops all
-    //                    15- Manual         - Feed23 -> Feed23 (none)
-    //                    15- Manual         - Feed23 -> Feed23 (none)
-
-    //                    14- Inb.           - Feed14 -> Feed14 (none) (manual)
-    //                    15- Inb.           - Feed23 -> Feed23 (none) (manual)
-
+    //Possible transfers: 0  - Inner    -> Feed14
+    //                    1  - Inner    -> Feed23
+    //                    2  - Inner    -> Feeds
+    //                    3  - Inner    -> Outer
+    //                    4  - Mid      -> Feed14
+    //                    5  - Mid      -> Feed23
+    //                    6  - Mid      -> Feeds
+    //                    7  - Mid      -> Outer
+    //                    8  - Trim     -> Inner
+    //                    9  - Trim     -> Mid
+    //                    10 - Trim     -> Feeds
+    //                    11 - Outer    -> Inner
+    //                    12 - Outer    -> Mid
+    //                    13 - Outer    -> Feeds
+    //                    14 - ALL      -> Jettison
 
     void FQMS::updateLoop(int remMinutes) {
         this->pumpStatusCheck();
@@ -218,7 +192,152 @@ namespace PlaneFuelSystem {
         this->applyState();
     }
 
-    void FQMS::
+    void FQMS::updateCGTarget(int GW) {
+        double GWt = GW / 1000.0;
+        this->CGTarget = (5058.4908643318586 + sqrt(25588329.824528873888 - 253.782771599910176 * (101088.31599889736 - GW))) / 126.891385799955088;
+    }
+
+    void FQMS::selectTransfers() {
+        if (this->abnCases[7])
+            return; //if we are have too many failures, no automatic transfers are possible
+        if (this->abnCases[0]) {
+            this->selectCase1Transfers();
+        }
+        if (this->abnCases[1]) {
+            this->selectCase2Transfers();
+            return;
+        }
+        if (this->abnCases[6]) {
+            this->selectCase6Transfers();
+            return;
+        }
+        this->selectNormalTransfers();
+
+    }
+
+    void FQMS::selectNormalTransfers(int remTimeMins, double currCG) {
+        bool mainFoundTank = false;
+        this->fwdOccupied = false;
+        this->aftOccupied = false;
+
+        for (int i=0; i<15; i++) {
+            this->lastTransfers[i] = this->commandedTransfers[i];
+            this->commandedTransfers[i] = false;
+        }
+        if (!inFlight)
+            return;
+
+        //MAIN TRANSFERS
+        if (this->tankLevels[3]+this->tankLevels[6] > 200 || this->tankLevels[2]+ this->tankLevels[7] > 8000 ) { //different thresholds
+            int innOrMid = this->tankLevels[3]+this->tankLevels[6] > 200 ? 0 : 4; //if inner with fuel, select 0/1, if empty, selects 4/5
+            mainFoundTank = true;
+
+            if (remTimeMins < 90) {
+                if (this->tankLevels[1] < 16560 || this->tankLevels[8] < 16560 ||
+                        (this->lastTransfers[innOrMid] && (this->tankLevels[1] < 17560 || this->tankLevels[8] < 17560 ))) {
+                    this->commandedTransfers[innOrMid] = true;
+                    this->fwdOccupied = true;
+                }
+                if (this->tankLevels[4] < 17840 || this->tankLevels[5] < 17840 ||
+                    (this->lastTransfers[innOrMid+1] && (this->tankLevels[4] < 18840 || this->tankLevels[5] < 18840 ))) {
+                    this->commandedTransfers[innOrMid + 1] = true;
+                    this->fwdOccupied = true;
+                }
+            }
+            else { //Remaining time > 90min
+                if (this->tankLevels[1] < 19560 || this->tankLevels[8] < 19560 ||
+                    (this->lastTransfers[innOrMid] && (this->tankLevels[1] < 20560 || this->tankLevels[8] < 20560 ))) {
+                    this->commandedTransfers[innOrMid] = true;
+                    this->fwdOccupied = true;
+                }
+                if (this->tankLevels[4] < 17840 || this->tankLevels[5] < 17840 ||
+                    (this->lastTransfers[innOrMid+1] && (this->tankLevels[4] < 18840 || this->tankLevels[5] < 18840))) {
+                    this->commandedTransfers[innOrMid + 1] = true;
+                    this->fwdOccupied = true;
+                }
+            }
+        }
+        if (!mainFoundTank && this->tankLevels[2]+ this->tankLevels[7] > 200) {
+            mainFoundTank = true;
+            if ((this->tankLevels[1] < 19560 || this->tankLevels[8] < 19560 || this->tankLevels[4] < 19560 || this->tankLevels[5] < 19560) &&
+                (!this->lastTransfers[6] && this->tankLevels[1] < 20560 && this->tankLevels[8] < 20560 && this->tankLevels[4] < 20560 && this->tankLevels[5] < 20560) ||  // to start
+                (this->lastTransfers[6] && (this->tankLevels[1] < 20560 || this->tankLevels[8] < 20560 ||  this->tankLevels[4] < 20560 || this->tankLevels[5] < 20560))) { //to continue
+                this->commandedTransfers[6] = true;
+                this->fwdOccupied = true;
+            }
+        }
+        if (!mainFoundTank && this->tankLevels[10] > 100) {
+            mainFoundTank = true;
+            if ((this->tankLevels[1] < 6000 || this->tankLevels[8] < 6000 || this->tankLevels[4] < 6000 || this->tankLevels[5] < 6000) || // to start
+                this->lastTransfers[10]) { //to continue
+                this->commandedTransfers[10] = true;
+                this->aftOccupied = true;
+            }
+        }
+
+        if (!mainFoundTank && this->tankLevels[0] + this->tankLevels[9] > 200) { //technically simplified (the tanks should be treated as pairs instead of all them but that would add complexity
+            if ((this->tankLevels[1] < 4000 || this->tankLevels[8] < 4000 || this->tankLevels[4] < 4000 || this->tankLevels[5] < 4000) || // to start
+                (this->lastTransfers[13] && (this->tankLevels[1] < 4500 || this->tankLevels[8] < 4500 || this->tankLevels[4] < 4500 || this->tankLevels[5] < 4500))) { //to continue
+                this->commandedTransfers[13] = true;
+                this->fwdOccupied = true;
+            }
+        }
+
+        //LOAD TRANSFERS
+
+        //To outer tanks
+        if (this->FOB > 50000 && this->tankLevels[0]+ this->tankLevels[9] < 16230) { //if fob>50t && outer not full
+            if (!fwdOccupied) {
+                if (this->tankLevels[3]+this->tankLevels[6] > 200) { //if inner not empty
+                    this->commandedTransfers[3] = true;
+                    fwdOccupied = true;
+                }
+                else if (this->tankLevels[2]+ this->tankLevels[7] > 200) {
+                    this->commandedTransfers[7] = true;
+                    fwdOccupied = true;
+                }
+            }
+        }
+
+        //From trim Tank
+        if (!aftOccupied && true) { //TODO add time and FL conditions
+            if (this->tankLevels[1]+this->tankLevels[4]+this->tankLevels[5]+this->tankLevels[8] < 89400) { //if feeds not full
+                this->commandedTransfers[10] = true;
+                aftOccupied = true;
+            }
+            else if (this->tankLevels[2]+this->tankLevels[7] < 57200) { //if mids not empty
+                this->commandedTransfers[9] = true;
+                aftOccupied = true;
+            }
+            else if (this->tankLevels[3]+ this->tankLevels[6] < 72400) { //if inners not empty
+                this->commandedTransfers[8] = true;
+                aftOccupied = true;
+            }
+        }
+
+        //From outer tanks
+        if (!fwdOccupied && (this->tankLevels[0] > 4000 || this->tankLevels[9] > 4000) && true) { //TODO add time and FL conditions
+            if (this->tankLevels[1]+this->tankLevels[4]+this->tankLevels[5]+this->tankLevels[8] < 89400) { //if feeds not full
+                this->commandedTransfers[13] = true;
+                fwdOccupied = true;
+            }
+            else if (this->tankLevels[2]+this->tankLevels[7] < 57200) { //if mids not empty
+                this->commandedTransfers[12] = true;
+                fwdOccupied = true;
+            }
+            else if (this->tankLevels[3]+ this->tankLevels[6] < 72400) { //if inners not empty
+                this->commandedTransfers[11] = true;
+                fwdOccupied = true;
+            }
+        }
+
+        //CG TRANSFERS from trim
+        if (currCG > this->CGTarget || ((this->lastTransfers[8] || this->lastTransfers[9] || this->lastTransfers[10]) && currCG > CGTarget - 1)) {
+            //TODO see if conditions about tanks are correct
+        }
+
+
+    }
 
 
 
@@ -384,12 +503,14 @@ namespace PlaneFuelSystem {
                            this->fqdc->readQuantitySensorDirect(13),
                            this->fqdc->readQuantitySensorDirect(14)};
 
+        this->FOB = 0;
         for (int i = 0; i< 15; i++) {
             double diff = (1.0 * directRead[i]) / (1.0 * fqdcRead[i]);
             if (diff < 0.98 || diff > 1.02) {
                 //exception maybe, is failure
             }
             this->tankLevels[i] = fqdcRead[i];
+            this->FOB += fqdcRead[i];
         }
     }
 
