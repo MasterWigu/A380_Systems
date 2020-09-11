@@ -8,9 +8,21 @@
 #include "FQDC.h"
 #include "FQMS.h"
 
-class SystemControl {
 
-};
+namespace PlaneFuelSystem {
+    class SystemControl {
+    private:
+        FuelSystem::FuelSystem* fuelSystem;
+        PlaneFuelSystem::FQDC* fqdc;
+        PlaneFuelSystem::FQMS* fqms;
+    public:
+        SystemControl();
+
+        void update(int remMinutes, int GW, double currCG, float simulatorTime);
+        FQMS* getFQMS();
+    };
+
+}
 
 
 #endif //A380_SYSTEMS_SYSTEMCONTROL_H

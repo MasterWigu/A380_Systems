@@ -64,6 +64,8 @@ namespace PlaneFuelSystem {
         FQMS(FuelSystem::FuelSystem *fS, FQDC *f);
 
         void updateLoop(int remMinutes, int GW, double currCG);
+
+        int getPumpStateECAM(int id);
     };
 }
 

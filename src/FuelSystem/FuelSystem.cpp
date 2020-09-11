@@ -289,8 +289,8 @@ namespace FuelSystem {
         this->consumers[6]->setState(0);   // Right   Jettison
     }
 
-    void FuelSystem::update() {
-
+    void FuelSystem::update(float simulatorTime) {
+        //TODO use simulator time to convert rates to quantities!!
         //1st stage, reset effective buses
         for (int i = 0; i < 8; i++) { //we have 8 buses (0-7)
             this->fuelBuses[i]->setEfBusNum(i);
@@ -494,7 +494,7 @@ namespace FuelSystem {
     int FuelSystem::readValveState(int id) {
         if (id == 28 || id == 29)
             return this->emergValves[id-28]->getState();
-        if (id <= 20)
+        else if (id <= 21)
             return this->tankValves[id]->getState();
         else
             return this->busValves[id-30]->getState();
@@ -503,7 +503,7 @@ namespace FuelSystem {
     void FuelSystem::setValveState(int id, int state) {
         if (id == 28 || id == 29)
             this->emergValves[id-28]->setState(state);
-        if (id <= 21)
+        else if (id <= 21)
             this->tankValves[id]->setState(state);
         else
             this->busValves[id-30]->setState(state);

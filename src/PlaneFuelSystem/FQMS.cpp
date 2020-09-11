@@ -46,16 +46,16 @@ namespace PlaneFuelSystem {
         for (int i = 0; i < 20; i++)
             this->commandedPumpStates[i] = false;
 
-        this->commandedVlvStates = (bool* ) malloc(40 * sizeof(bool));
-        for (int i = 0; i < 40; i++)
+        this->commandedVlvStates = (bool* ) malloc(39 * sizeof(bool));
+        for (int i = 0; i < 39; i++)
             this->commandedVlvStates[i] = false;
 
         this->pumpsFailStates = (int*) malloc(21*sizeof(int));
         for (int i = 0; i < 21; i++)
             this->pumpsFailStates[i] = 0;
 
-        this->vlvsFailStates = (int*) malloc(40*sizeof(int));
-        for (int i = 0; i < 40; i++)
+        this->vlvsFailStates = (int*) malloc(39*sizeof(int));
+        for (int i = 0; i < 39; i++)
             this->vlvsFailStates[i] = 0;
 
         this->consValvesFailStates = (int*) malloc(7*sizeof(int));
@@ -151,7 +151,7 @@ namespace PlaneFuelSystem {
 
     }
 
-    //failPumpArray: {0 = Normal; 1 = Failed (off)}
+    //failPumpArray: {0 = Normal; 1 = Failed (off); 2 = Failed (On)} !!!Failed on is not used and may crash all of this, idk, i forgot to add it
     //failVlvArray: {0 = normal; 1 = Failed open; 2 = Failed closed
 
     //cases: 0 - Case 1
@@ -411,7 +411,7 @@ namespace PlaneFuelSystem {
     }
 
     void FQMS::vlvStatusCheck() {
-        for (int i = 0; i<40; i++) {
+        for (int i = 0; i<39; i++) {
             if (i>21 && i<28) {
                 this->vlvsFailStates[i] = 0; //these dont exist
                 continue;
@@ -486,7 +486,7 @@ namespace PlaneFuelSystem {
     }
 
     void FQMS::applyValveState() {
-        for (int i = 0; i< 40; i++) {
+        for (int i = 0; i< 39; i++) {
             if (i > 21 && i < 28) continue;
 
             this->fuelSystem->setValveState(i, this->commandedVlvStates[i]);
@@ -580,6 +580,16 @@ namespace PlaneFuelSystem {
             this->fuelSystem->setValveState(11, 0);
             this->fuelSystem->setValveState(9, 0);
         }
+    }
+
+    int FQMS::getPumpStateECAM(int id) {
+        if (this->pumpsFailStates[id] == 0 && this->pumpsCockpitButtons[id]) {
+            if(this->commandedPumpStates)
+                return 1; //pump running
+            return 0; //pump off
+        }
+        return 3;
+        //4 (abnOn) and 5 (LO)  are not implemented
     }
 
 }

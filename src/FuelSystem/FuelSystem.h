@@ -28,7 +28,7 @@ namespace FuelSystem {
     public:
         FuelSystem();
 
-        void update();
+        void update(float simulatorTime);
 
         void printEffectiveNums();
 

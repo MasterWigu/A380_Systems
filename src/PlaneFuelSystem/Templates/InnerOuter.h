@@ -17,8 +17,6 @@ namespace PlaneFuelSystem {
 
         bool **getTemplate(const int *tanks, bool *pmpFailures, bool *vlvFailures, const bool *cases, bool aut);
     };
-    };
-
 }
 
 

@@ -1,34 +1,24 @@
 #include <iostream>
 #include "FuelSystem/FuelSystem.h"
-#include "PlaneFuelSystem/FuelDistributor.h"
+#include "PlaneFuelSystem/SystemControl.h"
 #include <chrono>
 #include <fstream>
 
 int main() {
     std::cout << "Hello, World!" << std::endl;
-    /*FuelSystem::FuelSystem f = FuelSystem::FuelSystem();
-    //f.printEffectiveNums();
-    f.testSystem();
-    f.ACEssChanged(true);
-    f.AC1Changed(true);
-    f.AC2Changed(true);
-    f.AC3Changed(true);
-    f.AC4Changed(true);
-    f.DCEssChanged(true);
-    f.DC1Changed(true);
-    f.DC2Changed(true);
+    PlaneFuelSystem::SystemControl* s = new PlaneFuelSystem::SystemControl();
 
+    auto t1 = std::chrono::high_resolution_clock::now();
+    for (int i=0;i<10000; i++) {
 
-    for (int i=0;i<10; i++) {
-        auto t1 = std::chrono::high_resolution_clock::now();
-        f.update();
-        auto t2 = std::chrono::high_resolution_clock::now();
-        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
-        std::cout << "RUN: " << duration << std::endl;
+        s->update(100, 430000, 41.5, 10);
+
     }
-    f.debugPrint();
+    auto t2 = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+    std::cout << "RUN: " << duration << std::endl;
     //f.printEffectiveNums();*/
-
+    /*
     auto* f = new PlaneFuelSystem::DistributionTables();
 
     std::ofstream file;
@@ -43,7 +33,7 @@ int main() {
     }
     file.close();
 
-
+    */
 
     std::cout << "Hello, World!2" << std::endl;
 
