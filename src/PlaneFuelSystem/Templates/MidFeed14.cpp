@@ -6,9 +6,9 @@
 #include "MidFeed14.h"
 
 PlaneFuelSystem::MidFeed14::MidFeed14() {
-    this->pumpStates = (bool*) malloc(21*sizeof(bool));
-    this->valveStates = (bool*) malloc(40 * sizeof(bool));
-    this->output = (bool**) malloc(2*sizeof(bool*));
+    this->pumpStates = (int*) malloc(21*sizeof(int));
+    this->valveStates = (int*) malloc(40 * sizeof(int));
+    this->output = (int**) malloc(2*sizeof(int*));
     this->output[0] = this->pumpStates;
     this->output[1] = this->valveStates;
 }
@@ -19,9 +19,9 @@ PlaneFuelSystem::MidFeed14::~MidFeed14() {
     free(this->output);
 }
 
-bool **PlaneFuelSystem::MidFeed14::getTemplate(const int* tanks, bool *pmpFailures, bool *vlvFailures, const bool *cases, bool aut) {
-    for (int i = 0; i < 40; i++) this->valveStates[i] = false;
-    for (int i = 0; i< 21; i++) this->pumpStates[i] = false;
+int **PlaneFuelSystem::MidFeed14::getTemplate(const int* tanks, int *pmpFailures, int *vlvFailures, const bool *cases, bool aut, bool someManual) {
+    for (int i = 0; i < 40; i++) this->valveStates[i] = 0;
+    for (int i = 0; i< 21; i++) this->pumpStates[i] = 0;
 
     bool f1 = true; bool f8 = true;
 
@@ -32,17 +32,17 @@ bool **PlaneFuelSystem::MidFeed14::getTemplate(const int* tanks, bool *pmpFailur
         f8 = false;
 
     if (!cases[1] && !cases[4] && !cases[7]) { //all normal, oh yes
-        if (f1) this->valveStates[2] = true;
-        if (f8) this->valveStates[16] = true;
-        this->pumpStates[9] = true;
-        this->pumpStates[15] = true;
+        if (f1) this->valveStates[2] = 1;
+        if (f8) this->valveStates[16] = 1;
+        this->pumpStates[9] = 1;
+        this->pumpStates[15] = 1;
         return this->output;
     }
     if ((cases[1] || cases[4]) && !cases[7] ) {//all transfers on aft or gallery swap for mid (uses aft)
-        if (f1) this->valveStates[3] = true;
-        if (f8) this->valveStates[17] = true;
-        this->pumpStates[10] = true;
-        this->pumpStates[16] = true;
+        if (f1) this->valveStates[3] = 1;
+        if (f8) this->valveStates[17] = 1;
+        this->pumpStates[10] = 1;
+        this->pumpStates[16] = 1;
         return this->output;
     }
     if (cases[7] && aut) {

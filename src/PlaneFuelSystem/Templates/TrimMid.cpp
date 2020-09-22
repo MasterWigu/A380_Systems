@@ -6,9 +6,9 @@
 #include <cstdlib>
 
 PlaneFuelSystem::TrimMid::TrimMid() {
-    this->pumpStates = (bool*) malloc(21*sizeof(bool));
-    this->valveStates = (bool*) malloc(40 * sizeof(bool));
-    this->output = (bool**) malloc(2*sizeof(bool*));
+    this->pumpStates = (int*) malloc(21*sizeof(int));
+    this->valveStates = (int*) malloc(40 * sizeof(int));
+    this->output = (int**) malloc(2*sizeof(int*));
     this->output[0] = this->pumpStates;
     this->output[1] = this->valveStates;
 }
@@ -19,9 +19,9 @@ PlaneFuelSystem::TrimMid::~TrimMid() {
     free(this->output);
 }
 
-bool **PlaneFuelSystem::TrimMid::getTemplate(const int* tanks, bool *pmpFailures, bool *vlvFailures, const bool *cases, bool aut) {
-    for (int i = 0; i < 40; i++) this->valveStates[i] = false;
-    for (int i = 0; i< 21; i++) this->pumpStates[i] = false;
+int **PlaneFuelSystem::TrimMid::getTemplate(const int* tanks, int *pmpFailures, int *vlvFailures, const bool *cases, bool aut, bool someManual) {
+    for (int i = 0; i < 40; i++) this->valveStates[i] = 0;
+    for (int i = 0; i< 21; i++) this->pumpStates[i] = 0;
 
     bool f2 = true; bool f7 = true;
 
@@ -32,19 +32,19 @@ bool **PlaneFuelSystem::TrimMid::getTemplate(const int* tanks, bool *pmpFailures
         f7 = false;
 
     if (!cases[0] && !cases[4] && !cases[7]) { //all normal, oh yes (aft)
-        if (f2) this->valveStates[5] = true;
-        if (f7) this->valveStates[15] = true;
-        this->valveStates[38] = true; //aft trim bus valve
-        this->pumpStates[18] = true;
-        this->pumpStates[19] = true;
+        if (f2) this->valveStates[5] = 1;
+        if (f7) this->valveStates[15] = 1;
+        this->valveStates[38] = 1; //aft trim bus valve
+        this->pumpStates[18] = 1;
+        this->pumpStates[19] = 1;
         return this->output;
     }
     if ((cases[0] || cases[4]) && !cases[7] ) {//all transfers on fwd or gallery swap for mid (uses fwd)
-        if (f2) this->valveStates[4] = true;
-        if (f7) this->valveStates[14] = true;
-        this->valveStates[37] = true; //fwd trim bus valve
-        this->pumpStates[18] = true;
-        this->pumpStates[19] = true;
+        if (f2) this->valveStates[4] = 1;
+        if (f7) this->valveStates[14] = 1;
+        this->valveStates[37] = 1; //fwd trim bus valve
+        this->pumpStates[18] = 1;
+        this->pumpStates[19] = 1;
         return this->output;
     }
     if (cases[7] && aut) {

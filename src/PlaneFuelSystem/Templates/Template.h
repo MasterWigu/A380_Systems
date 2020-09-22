@@ -8,16 +8,8 @@
 namespace PlaneFuelSystem {
 
     class Template {
-    private:
-        bool* pumps;
-        bool* tkVls;
-        bool* busVls;
     public:
-        Template(bool* pp, bool* tv, bool* bv);
-
-        bool* getPumps();
-        bool* getTkValves();
-        bool* getBusValves();
+        virtual int **getTemplate(const int *tanks, int *pmpFailures, int *vlvFailures, const bool *cases, bool aut, bool someManual) = 0;
     };
 }
 

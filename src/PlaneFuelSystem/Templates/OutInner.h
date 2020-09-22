@@ -5,17 +5,19 @@
 #ifndef A380_SYSTEMS_OUTINNER_H
 #define A380_SYSTEMS_OUTINNER_H
 
+#include "Template.h"
+
 namespace PlaneFuelSystem {
-    class OutInner {
+    class OutInner: public Template {
     private:
-        bool* valveStates;
-        bool* pumpStates;
-        bool ** output;
+        int* valveStates;
+        int* pumpStates;
+        int ** output;
     public:
         OutInner();
         ~OutInner();
 
-        bool **getTemplate(const int *tanks, bool *pmpFailures, bool *vlvFailures, const bool *cases, bool aut);
+        int **getTemplate(const int *tanks, int *pmpFailures, int *vlvFailures, const bool *cases, bool aut, bool someManual);
     };
 }
 

@@ -7,6 +7,7 @@
 namespace PlaneFuelSystem {
     FQDC::FQDC(FuelSystem::FuelSystem *fS) {
         this->fuelSystem = fS;
+        this->AGPFailed = false;
     }
 
     int FQDC::readQuantitySensorDirect(int id) {

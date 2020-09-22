@@ -10,7 +10,14 @@
 #include "../../include/SDK/CHeaders/XPLM/XPLMPlugin.h"
 #include "../PlaneFuelSystem/SystemControl.h"
 
-int GetFuelPumps(void* inRefcon, int *pInt, int i, int i1);
+int GetFuelPumps(void* inRefcon, int *out_val, int i_min, int i_max);
+int GetTrimValve(void* inRefcon);
+int GetCrossfeedValves(void* inRefcon, int *out_val, int i_min, int i_max);
+int GetTransferValves(void* inRefcon, int *out_val, int i_min, int i_max);
+int GetOutletValves(void* inRefcon, int *out_val, int i_min, int i_max);
+int GetEmergValves(void* inRefcon, int *out_val, int i_min, int i_max);
+
+
 float FuelSystemFLCB(float inElapsedSinceLastCall, float inElapsedTimeSinceLastFlightLoop, int inCounter, void *inRefcon);
 
 

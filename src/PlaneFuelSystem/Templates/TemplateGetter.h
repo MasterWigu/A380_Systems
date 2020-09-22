@@ -6,6 +6,20 @@
 #define A380_SYSTEMS_TEMPLATEGETTER_H
 
 #include "Template.h"
+#include "InnerFeed14.h"
+#include "InnerFeed23.h"
+#include "InnerFeeds.h"
+#include "InnerOuter.h"
+#include "MidFeed14.h"
+#include "MidFeed23.h"
+#include "MidFeeds.h"
+#include "MidOuter.h"
+#include "OutFeeds.h"
+#include "OutInner.h"
+#include "OutMid.h"
+#include "TrimFeeds.h"
+#include "TrimInner.h"
+#include "TrimMid.h"
 
 namespace PlaneFuelSystem {
     class TemplateGetter {
@@ -15,7 +29,7 @@ namespace PlaneFuelSystem {
     public:
         TemplateGetter();
 
-        Template* getTemplate(int id);
+        int** getTemplate(int id, const int *tanks, int *pmpFailures, int *vlvFailures, const bool *cases, bool aut, bool someManual);
 
     };
 

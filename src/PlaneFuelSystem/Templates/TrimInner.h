@@ -5,17 +5,19 @@
 #ifndef A380_SYSTEMS_TRIMINNER_H
 #define A380_SYSTEMS_TRIMINNER_H
 
+#include "Template.h"
+
 namespace PlaneFuelSystem {
-    class TrimInner {
+    class TrimInner: public Template {
     private:
-        bool* valveStates;
-        bool* pumpStates;
-        bool ** output;
+        int* valveStates;
+        int* pumpStates;
+        int ** output;
     public:
         TrimInner();
         ~TrimInner();
 
-        bool **getTemplate(const int *tanks, int *pmpFailures, int *vlvFailures, const bool *cases, bool aut);
+        int **getTemplate(const int *tanks, int *pmpFailures, int *vlvFailures, const bool *cases, bool aut, bool someManual);
     };
 
 }

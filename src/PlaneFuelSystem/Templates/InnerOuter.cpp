@@ -6,9 +6,9 @@
 #include <cstdlib>
 
 PlaneFuelSystem::InnerOuter::InnerOuter() {
-    this->pumpStates = (bool*) malloc(21*sizeof(bool));
-    this->valveStates = (bool*) malloc(40 * sizeof(bool));
-    this->output = (bool**) malloc(2*sizeof(bool*));
+    this->pumpStates = (int*) malloc(21*sizeof(int));
+    this->valveStates = (int*) malloc(40 * sizeof(int));
+    this->output = (int**) malloc(2*sizeof(int*));
     this->output[0] = this->pumpStates;
     this->output[1] = this->valveStates;
 }
@@ -19,9 +19,9 @@ PlaneFuelSystem::InnerOuter::~InnerOuter() {
     free(this->output);
 }
 
-bool **PlaneFuelSystem::InnerOuter::getTemplate(const int* tanks, bool *pmpFailures, bool *vlvFailures, const bool *cases, bool aut) {
-    for (int i = 0; i < 40; i++) this->valveStates[i] = false;
-    for (int i = 0; i< 21; i++) this->pumpStates[i] = false;
+int **PlaneFuelSystem::InnerOuter::getTemplate(const int* tanks, int *pmpFailures, int *vlvFailures, const bool *cases, bool aut, bool someManual) {
+    for (int i = 0; i < 40; i++) this->valveStates[i] = 0;
+    for (int i = 0; i< 21; i++) this->pumpStates[i] = 0;
 
     bool f0 = true; bool f9 = true;
 
@@ -32,17 +32,17 @@ bool **PlaneFuelSystem::InnerOuter::getTemplate(const int* tanks, bool *pmpFailu
         f9 = false;
 
     if (!cases[1] && !cases[2] && !cases[3] && !cases[7]) { //all normal, oh yes (fwd)
-        if (f0) this->valveStates[0] = true;
-        if (f9) this->valveStates[18] = true;
-        this->pumpStates[11] = true;
-        this->pumpStates[13] = true;
+        if (f0) this->valveStates[0] = 1;
+        if (f9) this->valveStates[18] = 1;
+        this->pumpStates[11] = 1;
+        this->pumpStates[13] = 1;
         return this->output;
     }
     if ((cases[1] || cases[2] || cases[3]) && !cases[7] ) {//all transfers on aft or gallery swap for inner or to outer in aft (uses aft)
-        if (f0) this->valveStates[1] = true;
-        if (f9) this->valveStates[19] = true;
-        this->pumpStates[12] = true;
-        this->pumpStates[14] = true;
+        if (f0) this->valveStates[1] = 1;
+        if (f9) this->valveStates[19] = 1;
+        this->pumpStates[12] = 1;
+        this->pumpStates[14] = 1;
         return this->output;
     }
     if (cases[7] && aut) {

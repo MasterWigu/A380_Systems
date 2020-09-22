@@ -6,9 +6,9 @@
 #include <cstdlib>
 
 PlaneFuelSystem::OutInner::OutInner() {
-    this->pumpStates = (bool*) malloc(21*sizeof(bool));
-    this->valveStates = (bool*) malloc(40 * sizeof(bool));
-    this->output = (bool**) malloc(2*sizeof(bool*));
+    this->pumpStates = (int*) malloc(21*sizeof(int));
+    this->valveStates = (int*) malloc(40 * sizeof(int));
+    this->output = (int**) malloc(2*sizeof(int*));
     this->output[0] = this->pumpStates;
     this->output[1] = this->valveStates;
 }
@@ -19,9 +19,9 @@ PlaneFuelSystem::OutInner::~OutInner() {
     free(this->output);
 }
 
-bool **PlaneFuelSystem::OutInner::getTemplate(const int* tanks, bool *pmpFailures, bool *vlvFailures, const bool *cases, bool aut) {
-    for (int i = 0; i < 40; i++) this->valveStates[i] = false;
-    for (int i = 0; i< 21; i++) this->pumpStates[i] = false;
+int **PlaneFuelSystem::OutInner::getTemplate(const int* tanks, int *pmpFailures, int *vlvFailures, const bool *cases, bool aut, bool someManual) {
+    for (int i = 0; i < 40; i++) this->valveStates[i] = 0;
+    for (int i = 0; i< 21; i++) this->pumpStates[i] = 0;
 
     bool f3 = true; bool f6 = true;
 
@@ -32,10 +32,10 @@ bool **PlaneFuelSystem::OutInner::getTemplate(const int* tanks, bool *pmpFailure
         f6 = false;
 
     if (!cases[1] && !cases[5] && !cases[7]) { //all normal, oh yes (fwd)
-        if (f3) this->valveStates[6] = true;
-        if (f6) this->valveStates[12] = true;
-        this->pumpStates[8] = true;
-        this->pumpStates[17] = true;
+        if (f3) this->valveStates[6] = 1;
+        if (f6) this->valveStates[12] = 1;
+        this->pumpStates[8] = 1;
+        this->pumpStates[17] = 1;
         return this->output;
     }
     if ((cases[1] || cases[5]) && !cases[7] ) {//all transfers on aft or grav from outer (uses fwd)

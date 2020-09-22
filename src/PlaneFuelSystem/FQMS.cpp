@@ -11,6 +11,8 @@ namespace PlaneFuelSystem {
         this->fqdc = f;
         this->arraysInit();
 
+        this->templates = new TemplateGetter();
+
         this->fwdOccupied = false;
         this->aftOccupied = false;
 
@@ -21,18 +23,14 @@ namespace PlaneFuelSystem {
 
         this->inFlight = false;
         this->CGTarget = 0;
+        this->FL = 0;
+        this->simTime = -1;
+        this->lastSimTime = -1;
+        this->flWasAbove255 = false;
+
     }
 
     void FQMS::arraysInit() {
-        this->mainTransferDest = (bool*) malloc(4*sizeof(bool));
-        for (int i = 0; i < 4; i++)
-            this->mainTransferDest[i] = false;
-
-        this->mainTransferSrc = (bool*) malloc(4*sizeof(bool));
-        for (int i = 0; i < 4; i++)
-            this->mainTransferSrc[i] = false;
-
-
         //NOTE: case 4 is two cases, for mid or inner, that makes a total of 7 cases instead of 6
         this->abnCases = (bool *) malloc(7 * sizeof(bool));
         for (int i = 0; i < 7; i++)
@@ -42,25 +40,22 @@ namespace PlaneFuelSystem {
         for (int i = 0; i < 6; i++)
             this->tankLevels[i] = 0;
 
-        this->commandedPumpStates = (bool* ) malloc(20 * sizeof(bool));
-        for (int i = 0; i < 20; i++)
+        this->commandedPumpStates = (bool* ) malloc(21 * sizeof(bool));
+        for (int i = 0; i < 21; i++)
             this->commandedPumpStates[i] = false;
 
-        this->commandedVlvStates = (bool* ) malloc(39 * sizeof(bool));
+        //commVlvStates: 0-Closed, 1-Open, 2-GravOpen, 3-Manual Open, 4-Manual Grav Open
+        this->commandedVlvStates = (int* ) malloc(39 * sizeof(int));
         for (int i = 0; i < 39; i++)
-            this->commandedVlvStates[i] = false;
+            this->commandedVlvStates[i] = 0;
 
         this->pumpsFailStates = (int*) malloc(21*sizeof(int));
         for (int i = 0; i < 21; i++)
             this->pumpsFailStates[i] = 0;
 
-        this->vlvsFailStates = (int*) malloc(39*sizeof(int));
-        for (int i = 0; i < 39; i++)
+        this->vlvsFailStates = (int*) malloc(47*sizeof(int));
+        for (int i = 0; i < 47; i++)
             this->vlvsFailStates[i] = 0;
-
-        this->consValvesFailStates = (int*) malloc(7*sizeof(int));
-        for (int i = 0; i < 7; i++)
-            this->consValvesFailStates[i] = 0;
 
         this->commandedTransfers = (bool*) malloc(15 * sizeof(bool));
         for (int i = 0; i < 15; i++)
@@ -81,6 +76,16 @@ namespace PlaneFuelSystem {
         this->crossFeedCockpit = (bool*) malloc(4 * sizeof(bool));
         for (int i = 0; i < 4; i++)
             this->crossFeedCockpit[i] = false;
+
+        this->requestedLPValves = (bool*) malloc(5 * sizeof(bool));
+        for (int i = 0; i < 5; i++)
+            this->requestedLPValves[i] = false;
+
+
+        this->gravVlvsAux = (int*) malloc(10*sizeof(int));
+        this->gravVlvsAux[0] = 0; this->gravVlvsAux[1] = 1; this->gravVlvsAux[2] = 2; this->gravVlvsAux[3] = 3;
+        this->gravVlvsAux[4] = 16; this->gravVlvsAux[5] = 17; this->gravVlvsAux[6] = 18; this->gravVlvsAux[7] = 19;
+        this->gravVlvsAux[8] = 20; this->gravVlvsAux[9] = 21;
     }
 
     void FQMS::detectAbnCases() {
@@ -96,7 +101,7 @@ namespace PlaneFuelSystem {
             this->vlvsFailStates[9] != 0 || this->vlvsFailStates[11] != 0 || //feed23 tk aft vlvs
             this->vlvsFailStates[38] == 2 || //trim to aft vlv
             this->vlvsFailStates[37] == 1 || //trim to fwd vlv
-            this->consValvesFailStates[5] == 1 || this->consValvesFailStates[6] == 1) { //jettison valves
+            this->vlvsFailStates[45] == 1 || this->vlvsFailStates[46] == 1) { //jettison valves
 
 
             tempCases[0] = true;
@@ -151,6 +156,10 @@ namespace PlaneFuelSystem {
 
     }
 
+    //TODO call the templates and transform them in valve and pump commands
+    //TODO start converting the dataref to callback for ecam proc
+    //TODO make sticky register for ecam proc and memos to avoid callback every cycle
+
     //failPumpArray: {0 = Normal; 1 = Failed (off); 2 = Failed (On)} !!!Failed on is not used and may crash all of this, idk, i forgot to add it
     //failVlvArray: {0 = normal; 1 = Failed open; 2 = Failed closed
 
@@ -180,20 +189,64 @@ namespace PlaneFuelSystem {
     //                    13 - Outer    -> Feeds
     //                    14 - ALL      -> Jettison
 
-    void FQMS::updateLoop(int remMinutes, int GW, double currCG) {
+    void FQMS::updateLoop(int remMinutes, int GW, double currCG, float simulatorTime, int f) {
+        this->FL = f;
+
+        if (this->lastSimTime == -1)
+            this->lastSimTime = simulatorTime;
+        else
+            this->lastSimTime = this->simTime;
+        this->simTime = simulatorTime;
+
+        if (f > 2) //TODO temporary, assume inFlight = above 2000ft
+            this->inFlight = true;
+        else
+            this->inFlight = false;
+
+        this->updateTimers(remMinutes, f);
+
         this->updateCGTarget(GW);
-        this->pumpStatusCheck();
-        this->vlvStatusCheck();
         this->getTankLevels();
         this->detectAbnCases();
         this->selectTransfers(remMinutes, currCG);
+        this->applyTransfers();
 
         this->applyState();
     }
 
+    void FQMS::updateTimers(int remMinutes, int f) {
+        float deltaTime = this->simTime - this->lastSimTime;
+
+        //Update lever timers
+        if (f > 245)
+            this->timeBlwFL245 = 0;
+        else
+            this->timeBlwFL245 += deltaTime;
+
+        if (f < 255)
+            this->timeAbvFL255 = 0;
+        else {
+            this->timeAbvFL255 += deltaTime;
+            this->flWasAbove255 = true;
+        }
+
+
+        //Update time remaining timers
+        if (remMinutes > 30)
+            this->time30min = 0;
+        else
+            this->time30min += deltaTime;
+
+        if (remMinutes > 80)
+            this->time80min = 0;
+        else
+            this->time80min += deltaTime;
+
+    }
+
     void FQMS::updateCGTarget(int GW) {
         double GWt = GW / 1000.0;
-        this->CGTarget = (5058.4908643318586 + sqrt(25588329.824528873888 - 253.782771599910176 * (101088.31599889736 - GW))) / 126.891385799955088;
+        this->CGTarget = (5058.4908643318586 + sqrt(25588329.824528873888 - 253.782771599910176 * (101088.31599889736 - GWt))) / 126.891385799955088;
     }
 
     void FQMS::selectTransfers(int remFltTime, double currCG) {
@@ -285,7 +338,7 @@ namespace PlaneFuelSystem {
         //LOAD TRANSFERS
 
         //To outer tanks
-        if (this->FOB > 50000 && this->tankLevels[0]+ this->tankLevels[9] < 16230) { //if fob>50t && outer not full
+        if (this->FL > 3 && this->FOB > 50000 && this->tankLevels[0]+ this->tankLevels[9] < 16230) { //if fob>50t && outer not full
             if (!fwdOccupied) {
                 if (this->tankLevels[3]+this->tankLevels[6] > 200) { //if inner not empty
                     this->commandedTransfers[3] = true;
@@ -299,7 +352,8 @@ namespace PlaneFuelSystem {
         }
 
         //From trim Tank
-        if (!aftOccupied && true) { //TODO add time and FL conditions
+        if (this->time80min > 150 && (this->flWasAbove255 && this->timeBlwFL245 > 60) &&  !aftOccupied  && this->tankLevels[10] > 100 || //Start
+            this->lastTransfers[10] && this->tankLevels[10] > 100) { //continue (not all stop conditions are verified
             if (this->tankLevels[1]+this->tankLevels[4]+this->tankLevels[5]+this->tankLevels[8] < 89400) { //if feeds not full
                 this->commandedTransfers[10] = true;
                 aftOccupied = true;
@@ -315,7 +369,7 @@ namespace PlaneFuelSystem {
         }
 
         //From outer tanks
-        if (!fwdOccupied && (this->tankLevels[0] > 4000 || this->tankLevels[9] > 4000) && true) { //TODO add time and FL conditions
+        if (!fwdOccupied && (this->tankLevels[0] > 4000 || this->tankLevels[9] > 4000) && this->time30min > 150 && (this->flWasAbove255 && this->timeBlwFL245 > 60)) { //not all stop conditions are verified
             if (this->tankLevels[1]+this->tankLevels[4]+this->tankLevels[5]+this->tankLevels[8] < 89400) { //if feeds not full
                 this->commandedTransfers[13] = true;
                 fwdOccupied = true;
@@ -352,6 +406,26 @@ namespace PlaneFuelSystem {
 
         //COLD AUTOMATIC TRANSFER
         //TODO when temp is simulated
+    }
+
+
+    void FQMS::applyTransfers() {
+        int **result;
+        for (int i = 0; i < 14; i++) {
+            if (this->commandedTransfers[i]) {
+                result = this->templates->getTemplate(i, this->tankLevels, this->pumpsFailStates, this->vlvsFailStates,
+                                                      this->abnCases, true, false);
+
+                if (result != nullptr) {
+                    for  (int j = 0; j < 21; j++) {
+                        this->commandedPumpStates[j] = result[0][j] == 1;
+                    }
+                    for  (int j = 0; j < 39; j++) {
+                        this->commandedVlvStates[j] = result[1][j];
+                    }
+                }
+            }
+        }
     }
 
     void FQMS::getTankLevels() {
@@ -398,36 +472,6 @@ namespace PlaneFuelSystem {
         }
     }
 
-    void FQMS::pumpStatusCheck() {
-        for (int i=0; i<21; i++) {
-            if (this->commandedPumpStates[i] && this->fuelSystem->readPumpState(i) != 1 ||
-                !this->commandedPumpStates[i] && this->fuelSystem->readPumpState(i) != 0) {
-                this->pumpsFailStates[i] = 1; //failed
-            }
-            else {
-                this->pumpsFailStates[i] = 0;
-            }
-        }
-    }
-
-    void FQMS::vlvStatusCheck() {
-        for (int i = 0; i<39; i++) {
-            if (i>21 && i<28) {
-                this->vlvsFailStates[i] = 0; //these dont exist
-                continue;
-            }
-            if (this->commandedVlvStates[i] && this->fuelSystem->readValveState(i) != 1) {
-                this->vlvsFailStates[i] = 1; //failed close
-            }
-            else if (!this->commandedVlvStates[i] && this->fuelSystem->readValveState(i) != 0) {
-                this->vlvsFailStates[i] = 2; //failed open
-            }
-            else {
-                this->vlvsFailStates[i] = 0; //normal
-            }
-        }
-    }
-
     void FQMS::applyState() {
         this->applyPumpState();
         this->applyValveState();
@@ -441,144 +485,19 @@ namespace PlaneFuelSystem {
                 this->pumpsFailStates[i] = 1;
             }
         }
-        //turn off symetric pump to the one failed if we are trying to power on the failed (only for main wing pumps)
-        if (this->pumpsFailStates[8] && this->commandedPumpStates[8]) { //outer
-            this->fuelSystem->setPumpState(8, 0);
-            this->fuelSystem->setPumpState(17, 0);
-        }
-        if (this->pumpsFailStates[17] && this->commandedPumpStates[17]) { //outer
-            this->fuelSystem->setPumpState(8, 0);
-            this->fuelSystem->setPumpState(17, 0);
-        }
-        if (this->pumpsFailStates[9] && this->commandedPumpStates[9]) { //mid fwd
-            this->fuelSystem->setPumpState(9, 0);
-            this->fuelSystem->setPumpState(15, 0);
-        }
-        if (this->pumpsFailStates[15] && this->commandedPumpStates[15]) { //mid fwd
-            this->fuelSystem->setPumpState(15, 0);
-            this->fuelSystem->setPumpState(9, 0);
-        }
-        if (this->pumpsFailStates[10] && this->commandedPumpStates[10]) { //mid aft
-            this->fuelSystem->setPumpState(10, 0);
-            this->fuelSystem->setPumpState(16, 0);
-        }
-        if (this->pumpsFailStates[16] && this->commandedPumpStates[16]) { //mid aft
-            this->fuelSystem->setPumpState(16, 0);
-            this->fuelSystem->setPumpState(10, 0);
-        }
-        if (this->pumpsFailStates[11] && this->commandedPumpStates[11]) { //inner fwd
-            this->fuelSystem->setPumpState(11, 0);
-            this->fuelSystem->setPumpState(13, 0);
-        }
-        if (this->pumpsFailStates[13] && this->commandedPumpStates[13]) { //inner fwd
-            this->fuelSystem->setPumpState(13, 0);
-            this->fuelSystem->setPumpState(11, 0);
-        }
-        if (this->pumpsFailStates[12] && this->commandedPumpStates[12]) { //inner aft
-            this->fuelSystem->setPumpState(12, 0);
-            this->fuelSystem->setPumpState(14, 0);
-        }
-        if (this->pumpsFailStates[14] && this->commandedPumpStates[14]) { //inner aft
-            this->fuelSystem->setPumpState(14, 0);
-            this->fuelSystem->setPumpState(12, 0);
-        }
-
     }
 
     void FQMS::applyValveState() {
         for (int i = 0; i< 39; i++) {
             if (i > 21 && i < 28) continue;
 
-            this->fuelSystem->setValveState(i, this->commandedVlvStates[i]);
-            if (this->fuelSystem->readValveState(i) != this->commandedVlvStates[i]) { //if valve is failed
+            this->fuelSystem->setValveState(i, this->commandedVlvStates[i] ? 1 : 0);
+            if (this->fuelSystem->readValveState(i) != (this->commandedVlvStates[i] ? 1 : 0)) { //if valve is failed
                 if (this->fuelSystem->readValveState(i) == 1) //if valve is open
                     this->vlvsFailStates[i] = 1; //failed open
                 else                                        //else if valve is closed
                     this->vlvsFailStates[i] = 2; //failed closed
             }
-        }
-        //when a valve fails open, we can't do nothing
-        //if it fails closed, we close the opposite
-
-        if (this->vlvsFailStates[0] == 2 && this->commandedVlvStates[0]) { //outer fwd closed
-            this->fuelSystem->setValveState(0, 0);
-            this->fuelSystem->setValveState(18, 0);
-        }
-        if (this->vlvsFailStates[18] == 2 && this->commandedVlvStates[18]) { //outer fwd closed
-            this->fuelSystem->setValveState(0, 0);
-            this->fuelSystem->setValveState(18, 0);
-        }
-        if (this->vlvsFailStates[1] == 2 && this->commandedVlvStates[1]) { //outer aft closed
-            this->fuelSystem->setValveState(1, 0);
-            this->fuelSystem->setValveState(19, 0);
-        }
-        if (this->vlvsFailStates[19] == 2 && this->commandedVlvStates[19]) { //outer aft closed
-            this->fuelSystem->setValveState(1, 0);
-            this->fuelSystem->setValveState(19, 0);
-        }
-        if (this->vlvsFailStates[2] == 2 && this->commandedVlvStates[2]) { //feed14 fwd closed
-            this->fuelSystem->setValveState(2, 0);
-            this->fuelSystem->setValveState(16, 0);
-        }
-        if (this->vlvsFailStates[16] == 2 && this->commandedVlvStates[16]) { //feed14 fwd closed
-            this->fuelSystem->setValveState(16, 0);
-            this->fuelSystem->setValveState(2, 0);
-        }
-        if (this->vlvsFailStates[3] == 2 && this->commandedVlvStates[3]) { //feed14 aft closed
-            this->fuelSystem->setValveState(3, 0);
-            this->fuelSystem->setValveState(17, 0);
-        }
-        if (this->vlvsFailStates[17] == 2 && this->commandedVlvStates[17]) { //feed14 aft closed
-            this->fuelSystem->setValveState(17, 0);
-            this->fuelSystem->setValveState(3, 0);
-        }
-        if (this->vlvsFailStates[4] == 2 && this->commandedVlvStates[4]) { //mid fwd closed
-            this->fuelSystem->setValveState(4, 0);
-            this->fuelSystem->setValveState(14, 0);
-        }
-        if (this->vlvsFailStates[14] == 2 && this->commandedVlvStates[14]) { //mid fwd closed
-            this->fuelSystem->setValveState(14, 0);
-            this->fuelSystem->setValveState(4, 0);
-        }
-        if (this->vlvsFailStates[5] == 2 && this->commandedVlvStates[5]) { //mid aft closed
-            this->fuelSystem->setValveState(5, 0);
-            this->fuelSystem->setValveState(15, 0);
-        }
-        if (this->vlvsFailStates[15] == 2 && this->commandedVlvStates[15]) { //mid aft closed
-            this->fuelSystem->setValveState(15, 0);
-            this->fuelSystem->setValveState(5, 0);
-        }
-        if (this->vlvsFailStates[6] == 2 && this->commandedVlvStates[6]) { //inner fwd closed
-            this->fuelSystem->setValveState(6, 0);
-            this->fuelSystem->setValveState(12, 0);
-        }
-        if (this->vlvsFailStates[12] == 2 && this->commandedVlvStates[12]) { //inner fwd closed
-            this->fuelSystem->setValveState(12, 0);
-            this->fuelSystem->setValveState(6, 0);
-        }
-        if (this->vlvsFailStates[7] == 2 && this->commandedVlvStates[7]) { //inner aft closed
-            this->fuelSystem->setValveState(7, 0);
-            this->fuelSystem->setValveState(13, 0);
-        }
-        if (this->vlvsFailStates[13] == 2 && this->commandedVlvStates[13]) { //inner aft closed
-            this->fuelSystem->setValveState(13, 0);
-            this->fuelSystem->setValveState(7, 0);
-        }
-        if (this->vlvsFailStates[8] == 2 && this->commandedVlvStates[8]) { //feed23 fwd closed
-            this->fuelSystem->setValveState(8, 0);
-            this->fuelSystem->setValveState(10, 0);
-        }
-        if (this->vlvsFailStates[10] == 2 && this->commandedVlvStates[10]) { //feed23 fwd closed
-            this->fuelSystem->setValveState(10, 0);
-            this->fuelSystem->setValveState(8, 0);
-        }
-        if (this->vlvsFailStates[9] == 2 && this->commandedVlvStates[9]) { //feed23 aft closed
-            this->fuelSystem->setValveState(9, 0);
-            this->fuelSystem->setValveState(11, 0);
-        }
-        if (this->vlvsFailStates[11] == 2 && this->commandedVlvStates[11]) { //feed23 aft closed
-            this->fuelSystem->setValveState(11, 0);
-            this->fuelSystem->setValveState(9, 0);
         }
     }
 
@@ -592,4 +511,116 @@ namespace PlaneFuelSystem {
         //4 (abnOn) and 5 (LO)  are not implemented
     }
 
+    //failVlvArray: {0 = normal; 1 = Failed open; 2 = Failed closed
+    //valves IDs: 0-4 - Consumers (0-3 Eng, 4 APU)
+    //            5-24 - Wing tks (left->right) Fwd/Aft In
+    //            25    - Trim tk In
+    //            26-35 - Wing tks (left->right) Fwd/Aft Out
+    //            34-35 - Trim tk out
+    //            36-37 - Jettison
+
+    int FQMS::getEngLPStateECAM(int id) {
+        //id = [0, 3]
+        if (this->vlvsFailStates[id+40] == 1 && !this->requestedLPValves[id]) {
+            return 1; //Abn Open
+        }
+        if (this->vlvsFailStates[id+40] == 2 || (this->vlvsFailStates[id+40] == 0 && !this->requestedLPValves[id])) {
+            return 2; //Norm/Abn Closed
+        }
+        return 0; //Open
+    }
+
+    int FQMS::getAPUFeedStateECAM() {
+        if ((this->vlvsFailStates[44] == 0 || this->vlvsFailStates[44] == 2) && !this->requestedLPValves[4]) {
+            return 0; //Normal not fed
+        }
+        if (this->vlvsFailStates[44] == 1 && !this->requestedLPValves[4]) {
+            return 2; //Abn Fed
+        }
+        if (this->vlvsFailStates[44] == 2 && this->requestedLPValves[4]) {
+            return 3; //Abn Closed
+        }
+        return 1; //Normal Fed
+    }
+
+    int FQMS::getCrossfeedVlvsStateECAM(int id) {
+        //id = [0, 3]
+        if ((this->vlvsFailStates[id+30] == 2 || this->vlvsFailStates[id+30] == 0) && this->commandedVlvStates[id+30] == 0) {
+            return 0; //Valve closed
+        }
+        if ((this->vlvsFailStates[id+30] == 1 || this->vlvsFailStates[id+30] == 0) && this->commandedVlvStates[id+30] != 0) {
+            return 1; //Valve open
+        }
+        if (this->vlvsFailStates[id+30] == 2) {
+            return 2; //Valve failed closed
+        }
+        if (this->vlvsFailStates[id+30] == 1) {
+            return 3; //Valve failed open
+        }
+        return 0; //should never get here
+    }
+
+    int FQMS::getTrimVlvStateECAM() {
+        if (((this->vlvsFailStates[37] == 0 || this->vlvsFailStates[37] == 1) && this->commandedVlvStates[37] != 0) ||
+                ((this->vlvsFailStates[38] == 0 || this->vlvsFailStates[38] == 1) && this->commandedVlvStates[38] != 0) ||
+                ((this->vlvsFailStates[20] == 0 || this->vlvsFailStates[20] == 1) && this->commandedVlvStates[20] != 0) ||
+                ((this->vlvsFailStates[21] == 0 || this->vlvsFailStates[21] == 1) && this->commandedVlvStates[21] != 0)) {
+            return 0; //Not isolated
+        }
+        if (((this->vlvsFailStates[37] == 0 || this->vlvsFailStates[37] == 2) && this->commandedVlvStates[37] == 0) &&
+            ((this->vlvsFailStates[38] == 0 || this->vlvsFailStates[38] == 2) && this->commandedVlvStates[38] == 0) &&
+            ((this->vlvsFailStates[20] == 0 || this->vlvsFailStates[20] == 2) && this->commandedVlvStates[20] == 0) &&
+            ((this->vlvsFailStates[21] == 0 || this->vlvsFailStates[21] == 2) && this->commandedVlvStates[21] == 0)) {
+            return 1; //Isolated
+        }
+        if (((this->vlvsFailStates[37] == 1) && this->commandedVlvStates[37] == 0) ||
+            ((this->vlvsFailStates[38] == 1) && this->commandedVlvStates[38] == 0) ||
+            ((this->vlvsFailStates[20] == 1) && this->commandedVlvStates[20] == 0) ||
+            ((this->vlvsFailStates[21] == 1) && this->commandedVlvStates[21] == 0)) {
+            return 2; //Abn not isolated
+        }
+        return 3; //Abn isolated
+    }
+
+    int FQMS::getTransferVlvsStateECAM(int id) {
+        //id = [0, 20]
+        //TODO add special case for trim tk vlv (id = 20 -> 20+21)
+        if ((this->vlvsFailStates[id] == 0 || this->vlvsFailStates[id] == 2) && (this->commandedVlvStates[id]==0 || this->commandedVlvStates[id]==2 || this->commandedVlvStates[id]==4)) {
+            return 0; //no transfer
+        }
+        if ((this->vlvsFailStates[id] == 0 || this->vlvsFailStates[id] == 1) && this->commandedVlvStates[id]==1) {
+            return 1; //auto transfer
+        }
+        if ((this->vlvsFailStates[id] == 0 || this->vlvsFailStates[id] == 1) && this->commandedVlvStates[id]==3) {
+            return 2; //manual transfer
+        }
+        return 3; //Abn transfer (how can this happen boy?)
+    }
+
+    int FQMS::getGravVlvsStateECAM(int id) {
+        int innId = this->gravVlvsAux[id];
+        //id = [0, 9]
+        if ((this->vlvsFailStates[innId] == 0 || this->vlvsFailStates[innId] == 2) && (this->commandedVlvStates[innId]==0 || this->commandedVlvStates[innId]==1 || this->commandedVlvStates[innId]==3)) {
+            return 0; //no transfer
+        }
+        if ((this->vlvsFailStates[innId] == 0 || this->vlvsFailStates[innId] == 1) && this->commandedVlvStates[innId]==2) {
+            return 1; //auto transfer
+        }
+        if ((this->vlvsFailStates[innId] == 0 || this->vlvsFailStates[innId] == 1) && this->commandedVlvStates[innId]==4) {
+            return 2; //manual transfer
+        }
+        //TODO this will fuck up im sure
+        return 3; //Abn transfer
+    }
+
+    int FQMS::getEmergVlvStateECAM(int id) {
+        //id = [0, 1]
+        if ((this->vlvsFailStates[id+28] == 0 || this->vlvsFailStates[id+28] == 2) && this->commandedVlvStates[id+28]==0) {
+            return 0; //norm closed
+        }
+        if ((this->vlvsFailStates[id+28] == 0 || this->vlvsFailStates[id+28] == 1) && (this->commandedVlvStates[id+28]==1 || this->commandedVlvStates[id+28]==3)) {
+            return 1; //norm open
+        }
+    return 2; //abn closed/open
+    }
 }

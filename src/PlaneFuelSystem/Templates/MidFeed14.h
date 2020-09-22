@@ -5,17 +5,19 @@
 #ifndef A380_SYSTEMS_MIDFEED14_H
 #define A380_SYSTEMS_MIDFEED14_H
 
+#include "Template.h"
+
 namespace PlaneFuelSystem {
-    class MidFeed14 {
+    class MidFeed14: public Template {
     private:
-        bool* valveStates;
-        bool* pumpStates;
-        bool ** output;
+        int* valveStates;
+        int* pumpStates;
+        int ** output;
     public:
         MidFeed14();
         ~MidFeed14();
 
-        bool **getTemplate(const int *tanks, bool *pmpFailures, bool *vlvFailures, const bool *cases, bool aut);
+        int **getTemplate(const int *tanks, int *pmpFailures, int *vlvFailures, const bool *cases, bool aut, bool someManual);
     };
 }
 

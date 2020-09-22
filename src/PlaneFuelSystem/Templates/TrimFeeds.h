@@ -6,17 +6,19 @@
 #define A380_SYSTEMS_TRIMFEEDS_H
 
 
+#include "Template.h"
+
 namespace PlaneFuelSystem {
-    class TrimFeeds {
+    class TrimFeeds: public Template {
     private:
-        bool* valveStates;
-        bool* pumpStates;
-        bool ** output;
+        int* valveStates;
+        int* pumpStates;
+        int ** output;
     public:
         TrimFeeds();
         ~TrimFeeds();
 
-        bool **getTemplate(const int *tanks, bool *pmpFailures, bool *vlvFailures, const bool *cases, bool aut, bool someManual);
+        int **getTemplate(const int *tanks, int *pmpFailures, int *vlvFailures, const bool *cases, bool aut, bool someManual);
     };
 }
 

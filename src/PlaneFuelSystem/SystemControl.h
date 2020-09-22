@@ -18,7 +18,7 @@ namespace PlaneFuelSystem {
     public:
         SystemControl();
 
-        void update(int remMinutes, int GW, double currCG, float simulatorTime);
+        void update(int remMinutes, int GW, double currCG, float simulatorTime, int FL);
         FQMS* getFQMS();
     };
 

@@ -7,6 +7,7 @@
 
 #include "../FuelSystem/FuelSystem.h"
 #include "FQDC.h"
+#include "Templates/TemplateGetter.h"
 
 namespace PlaneFuelSystem {
     class FQMS {
@@ -16,38 +17,47 @@ namespace PlaneFuelSystem {
         FuelSystem::FuelSystem* fuelSystem;
         PlaneFuelSystem::FQDC* fqdc;
 
+        PlaneFuelSystem::TemplateGetter* templates;
+
         bool fwdOccupied;
         bool aftOccupied;
 
-        bool* mainTransferDest;
-        bool* mainTransferSrc;
+        bool* abnCases{};
 
-        bool* abnCases;
+        int* tankLevels{};
 
-        int* tankLevels;
+        int* commandedVlvStates{};
+        bool* commandedPumpStates{};
 
-        bool* commandedVlvStates;
-        bool* commandedPumpStates;
-
-        int* vlvsFailStates;
-        int* pumpsFailStates;
-        int* consValvesFailStates;
-        bool* pumpsCockpitButtons;
-        bool* xfrCockpitButtons;
-        bool* crossFeedCockpit;
+        int* vlvsFailStates{};
+        int* pumpsFailStates{};
+        bool* pumpsCockpitButtons{};
+        bool* xfrCockpitButtons{};
+        bool* crossFeedCockpit{};
         bool emergValvesCockpit;
 
-        bool* commandedTransfers;
-        bool* lastTransfers;
+        bool* requestedLPValves;
+
+        bool* commandedTransfers{};
+        bool* lastTransfers{};
 
         bool inFlight;
-        int FOB;
+        int FOB{};
         double CGTarget;
+        int FL;
+        float simTime;
+        float lastSimTime;
+
+        bool flWasAbove255;
+        double time80min{};
+        double time30min{};
+        double timeAbvFL255{};
+        double timeBlwFL245{};
+
+        int* gravVlvsAux;
 
         void arraysInit();
 
-        void pumpStatusCheck();
-        void vlvStatusCheck();
         void getTankLevels();
 
         void updateCGTarget(int GW);
@@ -63,9 +73,30 @@ namespace PlaneFuelSystem {
     public:
         FQMS(FuelSystem::FuelSystem *fS, FQDC *f);
 
-        void updateLoop(int remMinutes, int GW, double currCG);
+        void updateLoop(int remMinutes, int GW, double currCG, float simulatorTime, int FL);
+
+
+
+        void updateTimers(int remMinutes, int f);
+
+
+        void applyTransfers();
 
         int getPumpStateECAM(int id);
+
+        int getCrossfeedVlvsStateECAM(int id);
+
+        int getEngLPStateECAM(int id);
+
+        int getAPUFeedStateECAM();
+
+        int getTrimVlvStateECAM();
+
+        int getTransferVlvsStateECAM(int id);
+
+        int getGravVlvsStateECAM(int id);
+
+        int getEmergVlvStateECAM(int id);
     };
 }
 
