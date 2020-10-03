@@ -8,7 +8,11 @@
 #include <cmath>
 #include "../../include/SDK/CHeaders/XPLM/XPLMDataAccess.h"
 #include "../../include/SDK/CHeaders/XPLM/XPLMPlugin.h"
+#include "../../include/SDK/CHeaders/XPLM/XPLMProcessing.h"
 #include "../PlaneFuelSystem/SystemControl.h"
+
+
+
 
 int GetFuelPumps(void* inRefcon, int *out_val, int i_min, int i_max);
 int GetTrimValve(void* inRefcon);

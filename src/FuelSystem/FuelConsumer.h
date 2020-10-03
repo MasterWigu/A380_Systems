@@ -8,23 +8,23 @@
 namespace FuelSystem {
     class FuelConsumer {
     private:
-        int rate;
+        double rate;
         int state; // 0-Closed, 1-Open
         int commandedState;
-        int lastSupply;
+        double lastSupply;
         bool isPowered;
         bool isJettison;
 
     public:
-        explicit FuelConsumer(int r);
-        FuelConsumer(int r, bool jet);
-        void setRate(int rate);
+        explicit FuelConsumer(double r);
+        FuelConsumer(double r, bool jet);
+        void setRate(double rate);
 
         int getState();
         void setState(int s);
 
         bool canConsume();
-        int consume(int amount);
+        double consume(double amount, float deltaTime);
 
         bool isFulfilled();
 

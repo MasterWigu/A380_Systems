@@ -61,11 +61,12 @@ namespace PlaneFuelSystem {
         void getTankLevels();
 
         void updateCGTarget(int GW);
+        void updateTimers(int remMinutes, int f);
         void detectAbnCases();
 
         void selectTransfers(int remFltTime, double currCG);
         void selectNormalTransfers(int remTimeMins, double currCG);
-
+        void applyTransfers();
         void applyState();
         void applyPumpState();
         void applyValveState();
@@ -76,11 +77,6 @@ namespace PlaneFuelSystem {
         void updateLoop(int remMinutes, int GW, double currCG, float simulatorTime, int FL);
 
 
-
-        void updateTimers(int remMinutes, int f);
-
-
-        void applyTransfers();
 
         int getPumpStateECAM(int id);
 

@@ -13,7 +13,7 @@ namespace FuelSystem {
         this->commandedState = 0;
     }
 
-    FuelTankValve::FuelTankValve(FuelSystem::FuelTank *location, int feedRate) {
+    FuelTankValve::FuelTankValve(FuelSystem::FuelTank *location, double feedRate) {
         this->valveLocation = location;
         this->state = 0;
         this->commandedState = 0;
@@ -31,10 +31,12 @@ namespace FuelSystem {
         return this->state;
     }
 
-    int FuelTankValve::getGravFeedable() {
-        if (this->state == 1 && this->gravFeedRate != 0) {
-            if (this->valveLocation->getFuel() > this->gravFeedRate) {
-                return this->gravFeedRate;
+    double FuelTankValve::getGravFeedable(float deltaTime) {
+        double maxFeedable = (this->gravFeedRate / 60.0) * deltaTime;
+
+        if (this->state == 1 && maxFeedable != 0) {
+            if (this->valveLocation->getFuel() > maxFeedable) {
+                return maxFeedable;
             }
             return this->valveLocation->getFuel();
         }
@@ -50,11 +52,11 @@ namespace FuelSystem {
         return false;
     }
 
-    int FuelTankValve::putInTank(int amount) {
+    double FuelTankValve::putInTank(double amount) {
         return this->valveLocation->addFuel(amount);
     }
 
-    void FuelTankValve::gravityFeed(int amount) {
+    void FuelTankValve::gravityFeed(double amount) {
         this->valveLocation->removeFuel(amount);
     }
 

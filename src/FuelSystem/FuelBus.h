@@ -18,18 +18,19 @@ namespace FuelSystem {
 
         FuelSystem::FuelPump** pumpsList;
         int numPumps;
+
         FuelSystem::FuelTankValve** tankValvesList;
         int numTankValves;
 
         FuelSystem::FuelConsumer** consumersList;
         int numConsumers;
 
-        FuelSystem::FuelBusValve** busValvesList;
-        int numBusValves;
+        FuelSystem::FuelBusValve** busValvesList{};
+        int numBusValves{};
 
-        int* pumpAmounts; //used to speed up calculations
-        int* gravFeedAmounts;
-        int totalPumpGravFuel;
+        double* pumpAmounts; //used to speed up calculations
+        double* gravFeedAmounts;
+        double totalPumpGravFuel;
 
     public:
         FuelBus(int bNum, FuelSystem::FuelPump** pumps, int nPumps, FuelSystem::FuelTankValve** tankValves, int nTValves, FuelSystem::FuelConsumer** consumers, int nCons);
@@ -43,11 +44,11 @@ namespace FuelSystem {
         void setEfBusNum(int bNum);
         int getEfBusNum();
 
-        int distribute(int amount);
-        int pump(int amount);
+        double distribute(double amount, float deltaTime);
+        double pump(double amount);
 
-        int getMaxAvailGravity();
-        int getMaxAvailPumped();
+        double getMaxAvailGravity(float deltaTime);
+        double getMaxAvailPumped(float deltaTime);
     };
 }
 

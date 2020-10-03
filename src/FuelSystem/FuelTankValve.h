@@ -13,20 +13,20 @@ namespace FuelSystem {
         int state = 0; // 0=Closed, 1=Opened
         int commandedState = 0;
         int isPowered;
-        int gravFeedRate = 0;  //if 0, valve cannot gravFeed
+        double gravFeedRate = 0;  //if 0, valve cannot gravFeed
 
     public:
         explicit FuelTankValve(FuelSystem::FuelTank* location);
-        FuelTankValve(FuelSystem::FuelTank* location, int feedRate);
+        FuelTankValve(FuelSystem::FuelTank* location, double feedRate);
 
         void setState(int nState);
         int getState() const;
 
         bool canPutInTank();
-        int putInTank(int amount);
+        double putInTank(double amount);
 
-        int getGravFeedable();
-        void gravityFeed(int amount);
+        double getGravFeedable(float deltaTime);
+        void gravityFeed(double amount);
 
         void setPower(bool p);
         bool getPower();

@@ -25,6 +25,9 @@ namespace FuelSystem {
         
         bool* enginesFulfilled;
 
+        float lastSimTime;
+        float simTime;
+
     public:
         FuelSystem();
 
@@ -45,11 +48,14 @@ namespace FuelSystem {
         void DC1Changed(bool powered);
         void DC2Changed(bool powered);
 
-        int readQuantity(int i);
+        double readQuantity(int i);
         int readValveState(int id);
         void setValveState(int id, int state);
         int readPumpState(int id);
         void setPumpState(int id, int state);
+
+
+
     };
 }
 

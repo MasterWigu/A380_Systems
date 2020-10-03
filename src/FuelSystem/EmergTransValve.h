@@ -13,7 +13,7 @@ namespace FuelSystem {
         int state = 0; // 0=Closed, 1=Opened
         int commandedState;
         bool isPowered;
-        int rate;
+        double rate;
 
         FuelSystem::FuelTank* upper;
         FuelSystem::FuelTank* lower;

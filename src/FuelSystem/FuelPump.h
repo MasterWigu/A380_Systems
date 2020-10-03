@@ -10,7 +10,7 @@
 namespace FuelSystem{
     class FuelPump {
     private:
-        int maxPumpRate = 0; //In kg/h
+        double maxPumpRate = 0; //In kg/h
         int state = 0; // 0-Off, 1-On
         int commandedState;
         bool hasPower;
@@ -21,9 +21,9 @@ namespace FuelSystem{
 
     public:
         FuelPump(FuelSystem::FuelTank* location, int rate, bool iF);
-        int getPumpable();
+        double getPumpable(float deltaTime);
         bool canPump();
-        void pumpFuel(int amount);
+        void pumpFuel(double amount);
 
         void setState(int s);
         int getState();

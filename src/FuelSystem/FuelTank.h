@@ -7,21 +7,21 @@
 namespace FuelSystem {
     class FuelTank {
     private:
-        int capacityKg = -1;
-        int collectorCapacity;
-        int currFuelKg = 0;
+        double capacityKg = -1;
+        double collectorCapacity;
+        double currFuelKg = 0;
 
     public:
-        explicit FuelTank(int capacity);
-        FuelTank(int capacity, int collCap);
+        explicit FuelTank(double capacity);
+        FuelTank(double capacity, double collCap);
 
-        void setFuel(int fuelKg);
-        int getFuel() const;
-        int getCollectorFuel() const;
+        void setFuel(double fuelKg);
+        double getFuel() const;
+        double getCollectorFuel() const;
 
-        int addFuel(int amount);
-        int removeFuel(int amount);
-        int removeFuelCollector(int amount);
+        double addFuel(double amount);
+        double removeFuel(double amount);
+        double removeFuelCollector(double amount);
 
         bool isFull() const;
         bool isEmpty() const;

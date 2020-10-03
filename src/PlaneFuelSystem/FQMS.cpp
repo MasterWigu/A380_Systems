@@ -156,7 +156,6 @@ namespace PlaneFuelSystem {
 
     }
 
-    //TODO call the templates and transform them in valve and pump commands
     //TODO start converting the dataref to callback for ecam proc
     //TODO make sticky register for ecam proc and memos to avoid callback every cycle
 
@@ -412,8 +411,8 @@ namespace PlaneFuelSystem {
     void FQMS::applyTransfers() {
         int **result;
         for (int i = 0; i < 14; i++) {
-            if (this->commandedTransfers[i]) {
-                result = this->templates->getTemplate(i, this->tankLevels, this->pumpsFailStates, this->vlvsFailStates,
+                    if (this->commandedTransfers[i]) {
+                        result = this->templates->getTemplate(i, this->tankLevels, this->pumpsFailStates, this->vlvsFailStates,
                                                       this->abnCases, true, false);
 
                 if (result != nullptr) {
@@ -584,7 +583,23 @@ namespace PlaneFuelSystem {
 
     int FQMS::getTransferVlvsStateECAM(int id) {
         //id = [0, 20]
-        //TODO add special case for trim tk vlv (id = 20 -> 20+21)
+        //TODO check if case of valve 20 is working
+        if (id == 20) {
+            if ((this->vlvsFailStates[20] == 0 || this->vlvsFailStates[20] == 2) && (this->commandedVlvStates[20]==0 || this->commandedVlvStates[20]==2 || this->commandedVlvStates[20]==4) &&
+                    (this->vlvsFailStates[21] == 0 || this->vlvsFailStates[21] == 2) && (this->commandedVlvStates[21]==0 || this->commandedVlvStates[21]==2 || this->commandedVlvStates[21]==4)) {
+                return 0; //no transfer
+            }
+            if ((this->vlvsFailStates[20] == 0 || this->vlvsFailStates[20] == 1) && this->commandedVlvStates[20]==1 &&
+                    (this->vlvsFailStates[21] == 0 || this->vlvsFailStates[21] == 1) && this->commandedVlvStates[21]==1) {
+                return 1; //auto transfer
+            }
+            if ((this->vlvsFailStates[20] == 0 || this->vlvsFailStates[20] == 1) && this->commandedVlvStates[20]==3 ||
+                    (this->vlvsFailStates[21] == 0 || this->vlvsFailStates[21] == 1) && this->commandedVlvStates[21]==3) {
+                return 2; //manual transfer
+            }
+            return 3;
+        }
+
         if ((this->vlvsFailStates[id] == 0 || this->vlvsFailStates[id] == 2) && (this->commandedVlvStates[id]==0 || this->commandedVlvStates[id]==2 || this->commandedVlvStates[id]==4)) {
             return 0; //no transfer
         }

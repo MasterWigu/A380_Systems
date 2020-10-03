@@ -17,9 +17,9 @@ FuelSystem::FuelBus::FuelBus(int bNum, FuelSystem::FuelPump **pumps, int nPumps,
     }
     this->numPumps = nPumps;
 
-    this->pumpAmounts = (int*) malloc(nPumps*sizeof(int));
+    this->pumpAmounts = (double*) malloc(nPumps*sizeof(double));
     for (int i = 0; i<nPumps; i++)
-        this->pumpAmounts[i] = 0;
+        this->pumpAmounts[i] = 0.0;
 
     this->tankValvesList = (FuelTankValve**) malloc(nTValves * sizeof(FuelTankValve*));
     for (int i=0; i<nTValves; i++) {
@@ -27,9 +27,9 @@ FuelSystem::FuelBus::FuelBus(int bNum, FuelSystem::FuelPump **pumps, int nPumps,
     }
     this->numTankValves = nTValves;
 
-    this->gravFeedAmounts = (int*) malloc(nTValves*sizeof(int));;
+    this->gravFeedAmounts = (double*) malloc(nTValves*sizeof(double));;
     for (int i = 0; i<nTValves; i++)
-        this->gravFeedAmounts[i] = 0;
+        this->gravFeedAmounts[i] = 0.0;
 
     this->consumersList = (FuelConsumer**) malloc(nCons * sizeof(FuelConsumer*));
     for (int i=0; i<nCons; i++) {
@@ -37,14 +37,14 @@ FuelSystem::FuelBus::FuelBus(int bNum, FuelSystem::FuelPump **pumps, int nPumps,
     }
     this->numConsumers = nCons;
 
-    this->totalPumpGravFuel = 0;
+    this->totalPumpGravFuel = 0.0;
 }
 
-int FuelSystem::FuelBus::getMaxAvailPumped() {
-    int availKg = 0;
+double FuelSystem::FuelBus::getMaxAvailPumped(float deltaTime) {
+    double availKg = 0.0;
 
     for (int i = 0; i<this->numPumps; i++) {
-        this->pumpAmounts[i] = this->pumpsList[i]->getPumpable();
+        this->pumpAmounts[i] = this->pumpsList[i]->getPumpable(deltaTime);
         availKg += this->pumpAmounts[i];
     }
 
@@ -58,12 +58,12 @@ int FuelSystem::FuelBus::getMaxAvailPumped() {
 
 }
 
-int FuelSystem::FuelBus::getMaxAvailGravity() {
+double FuelSystem::FuelBus::getMaxAvailGravity(float deltaTime) {
     // This function can only be called after getMaxAvailPumped and only if that returned 0!!!!
-    int availKg = 0;
+    double availKg = 0;
 
     for (int i = 0; i<this->numTankValves; i++) {
-        this->gravFeedAmounts[i] = this->tankValvesList[i]->getGravFeedable();
+        this->gravFeedAmounts[i] = this->tankValvesList[i]->getGravFeedable(0);
         availKg += this->gravFeedAmounts[i];
     }
 
@@ -71,11 +71,11 @@ int FuelSystem::FuelBus::getMaxAvailGravity() {
     return availKg;
 }
 
-int FuelSystem::FuelBus::distribute(int amount) {
+double FuelSystem::FuelBus::distribute(double amount, float deltaTime) {
     //consumers have priority always
     for (int i = 0; i<this->numConsumers; i++) {
         if (this->consumersList[i]->canConsume()) {
-            amount = this->consumersList[i]->consume(amount);
+            amount = this->consumersList[i]->consume(amount, deltaTime);
         }
     }
     if (amount <= 0) {
@@ -91,10 +91,10 @@ int FuelSystem::FuelBus::distribute(int amount) {
         return amount;
     }
 
-    int tempAmount = 0; // variable to check if we got to the point we cant spend more fuel
+    double tempAmount = 0.0; // variable to check if we got to the point we cant spend more fuel
     while (amount > 0 && tempAmount != amount) {
         tempAmount = amount;
-        int amountPerValve = amount / numOpenValves; // the amount of fuel to try to send per valve
+        double amountPerValve = amount / numOpenValves; // the amount of fuel to try to send per valve
         for (int i = 0; i<this->numTankValves; i++) {
             if (this->tankValvesList[i]->getState() == 1)
                 amount -= this->tankValvesList[i]->putInTank(amountPerValve);
@@ -104,13 +104,12 @@ int FuelSystem::FuelBus::distribute(int amount) {
     return amount;
 }
 
-int FuelSystem::FuelBus::pump(int amount) {
-    double percentage = (double)amount / (double)this->totalPumpGravFuel;
+double FuelSystem::FuelBus::pump(double amount) {
+    double percentage = amount / this->totalPumpGravFuel;
 
-
-    int aux = 0;
+    double aux = 0;
     for (int i=0; i<this->numPumps; i++) {
-        aux = (int)std::round(pumpAmounts[i]*percentage);
+        aux = pumpAmounts[i]*percentage;
         amount -= aux;
         this->pumpsList[i]->pumpFuel(aux);
     }
@@ -118,7 +117,7 @@ int FuelSystem::FuelBus::pump(int amount) {
     if (amount <= 1) // <1 instead of ==0 to compensate rounding errors
         return 0;
     for (int i=0; i<this->numTankValves; i++) {
-        aux = (int)std::round(gravFeedAmounts[i]*percentage);
+        aux = gravFeedAmounts[i]*percentage;
         amount -= aux;
         this->tankValvesList[i]->gravityFeed(aux);
     }

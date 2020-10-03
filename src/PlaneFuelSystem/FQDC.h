@@ -6,6 +6,7 @@
 #define A380_SYSTEMS_FQDC_H
 
 #include "../FuelSystem/FuelSystem.h"
+#include <cmath>
 
 namespace PlaneFuelSystem {
     class FQDC {

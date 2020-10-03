@@ -3,9 +3,7 @@
 //
 
 #include "PluginControl.h"
-#include "../../include/SDK/CHeaders/XPLM/XPLMProcessing.h"
 
-#include <cmath>
 
 PlaneFuelSystem::SystemControl* systemControl;
 PlaneFuelSystem::FQMS* fqms;

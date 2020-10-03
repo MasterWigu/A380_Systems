@@ -11,7 +11,7 @@ namespace PlaneFuelSystem {
     }
 
     int FQDC::readQuantitySensorDirect(int id) {
-        return this->fuelSystem->readQuantity(id);
+        return (int)std::round(this->fuelSystem->readQuantity(id));
     }
 
     int FQDC::readQuantitySensorAGP(int id) {

@@ -25,9 +25,9 @@ int FuelSystem::EmergTansValve::getState() {
 
 void FuelSystem::EmergTansValve::transfer() {
     if (state == 1) { //only if valve is open
-        int valueToTransfer = this->upper->getFuel();
+        double valueToTransfer = this->upper->getFuel();
         if (valueToTransfer > this->rate) valueToTransfer = this->rate;
-        int remainder = this->lower->addFuel(valueToTransfer);
+        double remainder = this->lower->addFuel(valueToTransfer);
         this->upper->removeFuel(valueToTransfer - remainder);
     }
 }

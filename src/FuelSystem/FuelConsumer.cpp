@@ -6,7 +6,7 @@
 
 namespace FuelSystem {
 
-    FuelConsumer::FuelConsumer(int r) {
+    FuelConsumer::FuelConsumer(double r) {
         this->state = 0; // Starts closed
         this->commandedState = 0;
         this->rate = r;
@@ -15,7 +15,7 @@ namespace FuelSystem {
         this->isPowered = false;
     }
 
-    FuelConsumer::FuelConsumer(int r, bool jet) {
+    FuelConsumer::FuelConsumer(double r, bool jet) {
         this->state = 0; // Starts closed
         this->rate = r;
         this->lastSupply = r;
@@ -23,8 +23,8 @@ namespace FuelSystem {
         this->isPowered = false;
     }
 
-    void FuelConsumer::setRate(int rate) {
-        this->rate = rate;
+    void FuelConsumer::setRate(double r) {
+        this->rate = r;
     }
 
     bool FuelConsumer::canConsume() {
@@ -34,18 +34,22 @@ namespace FuelSystem {
         return false;
     }
 
-    int FuelConsumer::consume(int amount) {
+    double FuelConsumer::consume(double amount, float deltaTime) {
         // if the amount is not enough, it will return negative (deficit)
         // only the jettison valves dont create deficits
+
+        //calculate needed fuel
+        double neededFuel = (this->rate/ 60.0) * deltaTime;
+
         if (this->state == 1) {
             if (this->isJettison)
                 return 0;
 
-            if (amount > this->rate) // if supply was bigger than the rate, we consumed the rate, else we consumed all of it
-                this->lastSupply = rate;
+            if (amount > neededFuel) // if supply was bigger than the rate, we consumed the rate, else we consumed all of it
+                this->lastSupply = neededFuel;
             else
                 this->lastSupply = amount;
-            return amount - this->rate;
+            return amount - neededFuel;
         }
         return amount;
     }

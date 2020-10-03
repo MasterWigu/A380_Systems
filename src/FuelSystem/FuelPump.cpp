@@ -16,18 +16,20 @@ namespace FuelSystem {
         this->isFeed = iF;
     }
 
-    int FuelPump::getPumpable() {
+    double FuelPump::getPumpable(float deltaTime) {
         // IF pump is on, return max that we can pump being it all the fuel in the tank, or the max for the pump
+        double maxPumpable = (this->maxPumpRate/ 60.0) * deltaTime;
+
         if (this->state == 1) {
-            if (this->pumpLocation->getFuel() >= this->maxPumpRate) {
-                return this->maxPumpRate;
+            if (this->pumpLocation->getFuel() >= maxPumpable) {
+                return maxPumpable;
             }
             return this->pumpLocation->getFuel();
         }
         return 0;
     }
 
-    void FuelPump::pumpFuel(int amount) {
+    void FuelPump::pumpFuel(double amount) {
         // TODO check for addRemFuel not returning 0 (tank did not have enough fuel) (should not happen) (maybe it can, idk/c)
         if (this->isFeed)
             this->pumpLocation->removeFuelCollector(amount);

@@ -7,7 +7,7 @@
 
 namespace FuelSystem {
     FuelSystem::FuelSystem() {
-
+        //TODO express rates in kg/min
         this->tanks = (FuelTank**) malloc(11 * sizeof(FuelTank*));
 
         this->tanks[0]  = new FuelTank(8117);               //0  - left outer
@@ -182,6 +182,9 @@ namespace FuelSystem {
         for (int i = 0; i < 8; i++) {
             this->electricStatus[i] = false; //the plane starts powered down
         }
+
+        this->simTime = -1;
+        this->lastSimTime = -1;
     }
 
     void FuelSystem::printEffectiveNums() {
@@ -290,7 +293,14 @@ namespace FuelSystem {
     }
 
     void FuelSystem::update(float simulatorTime) {
-        //TODO use simulator time to convert rates to quantities!!
+        if (this->lastSimTime == -1)
+            this->lastSimTime = simulatorTime;
+        else
+            this->lastSimTime = this->simTime;
+        this->simTime = simulatorTime;
+        float deltaTime = this->simTime - this->lastSimTime;
+
+
         //1st stage, reset effective buses
         for (int i = 0; i < 8; i++) { //we have 8 buses (0-7)
             this->fuelBuses[i]->setEfBusNum(i);
@@ -318,20 +328,20 @@ namespace FuelSystem {
         }
 
         //3rd calculate flows in each effective bus
-        int totalAvailBus, totalAvailBusBefDist;
+        double totalAvailBus, totalAvailBusBefDist;
 
 
         for (int i = 0; i < 8; i++) { // For each effective bus number
             totalAvailBus = 0;
             for (int j = 0; j < 8; j++) { // We have to get the buses to make calculations
                 if (this->fuelBuses[j]->getEfBusNum() == i) { // if the bus has the current effective bus number
-                    totalAvailBus += this->fuelBuses[i]->getMaxAvailPumped();
+                    totalAvailBus += this->fuelBuses[i]->getMaxAvailPumped(deltaTime);
                 }
             }
             if (totalAvailBus == 0) { // If all the pumps in the bus are off, check gravity feeds
                 for (int j = 0; j < 8; j++) { // We have to get the buses to make calculations
                     if (this->fuelBuses[j]->getEfBusNum() == i) { // if the bus has the current effective bus number
-                        totalAvailBus += this->fuelBuses[i]->getMaxAvailGravity();
+                        totalAvailBus += this->fuelBuses[i]->getMaxAvailGravity(deltaTime);
                     }
                 }
             }
@@ -342,7 +352,7 @@ namespace FuelSystem {
             totalAvailBusBefDist = totalAvailBus;
             for (int j = 0; j < 8; j++) { // distribute the max fuel and see how much remains
                 if (this->fuelBuses[j]->getEfBusNum() == i) {
-                    totalAvailBus = this->fuelBuses[j]->distribute(totalAvailBus);
+                    totalAvailBus = this->fuelBuses[j]->distribute(totalAvailBus, deltaTime);
                 }
             }
             if (totalAvailBus < 0) { //if this happens, we are in trouble for sure
@@ -479,7 +489,8 @@ namespace FuelSystem {
         this->tankValves[21]->setPower(powered); //Trim right valve
     }
 
-    int FuelSystem::readQuantity(int id) {
+    double FuelSystem::readQuantity(int id) {
+        //TODO see if double makes difference upstream
         if (id == 11)
             return this->tanks[1]->getCollectorFuel();
         if (id == 12)
