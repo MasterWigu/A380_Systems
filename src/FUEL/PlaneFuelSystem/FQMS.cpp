@@ -81,6 +81,14 @@ namespace PlaneFuelSystem {
         for (int i = 0; i < 5; i++)
             this->requestedLPValves[i] = false;
 
+        this->ECAMProceduresNow = (bool*) malloc(104 * sizeof(bool));
+        for (int i = 0; i < 104; i++)
+            this->ECAMProceduresNow[i] = false;
+
+        this->ECAMProceduresPrevious = (bool*) malloc(104 * sizeof(bool));
+        for (int i = 0; i < 104; i++)
+            this->ECAMProceduresPrevious[i] = false;
+
 
         this->gravVlvsAux = (int*) malloc(10*sizeof(int));
         this->gravVlvsAux[0] = 0; this->gravVlvsAux[1] = 1; this->gravVlvsAux[2] = 2; this->gravVlvsAux[3] = 3;
@@ -156,8 +164,6 @@ namespace PlaneFuelSystem {
 
     }
 
-    //TODO start converting the dataref to callback for ecam proc
-    //TODO make sticky register for ecam proc and memos to avoid callback every cycle
 
     //failPumpArray: {0 = Normal; 1 = Failed (off); 2 = Failed (On)} !!!Failed on is not used and may crash all of this, idk, i forgot to add it
     //failVlvArray: {0 = normal; 1 = Failed open; 2 = Failed closed
@@ -204,6 +210,16 @@ namespace PlaneFuelSystem {
 
         this->updateTimers(remMinutes, f);
 
+
+        //Reset ecam proc
+        bool* temp = this->ECAMProceduresNow;
+        this->ECAMProceduresNow = this->ECAMProceduresPrevious;
+        this->ECAMProceduresPrevious = temp;
+
+        for (int i = 0; i<103; i++) {
+            this->ECAMProceduresNow[i] = false;
+        }
+
         this->updateCGTarget(GW);
         this->getTankLevels();
         this->detectAbnCases();
@@ -211,6 +227,8 @@ namespace PlaneFuelSystem {
         this->applyTransfers();
 
         this->applyState();
+        this->reportECAMProc();
+
     }
 
     void FQMS::updateTimers(int remMinutes, int f) {
@@ -250,7 +268,7 @@ namespace PlaneFuelSystem {
 
     void FQMS::selectTransfers(int remFltTime, double currCG) {
         if (this->abnCases[7])
-            return; //if we are have too many failures, no automatic transfers are possible
+            return; //if we have too many failures, no automatic transfers are possible
         if (this->abnCases[0]) {
             //this->selectCase1Transfers();
             return;
@@ -469,6 +487,49 @@ namespace PlaneFuelSystem {
             this->tankLevels[i] = fqdcRead[i];
             this->FOB += fqdcRead[i];
         }
+
+        //Sensing ECAM low level procedures
+        if (this->tankLevels[1] < 1375) {
+            this->ECAMProceduresNow[22] = true;
+        }
+        if (this->tankLevels[4] < 1375) {
+            this->ECAMProceduresNow[23] = true;
+        }
+        if (this->tankLevels[5] < 1375) {
+            this->ECAMProceduresNow[24] = true;
+        }
+        if (this->tankLevels[8] < 1375) {
+            this->ECAMProceduresNow[25] = true;
+        }
+        if (this->ECAMProceduresNow[22] &&
+            this->ECAMProceduresNow[23]) {
+            this->ECAMProceduresNow[42] = true;
+        }
+        if (this->ECAMProceduresNow[24] &&
+            this->ECAMProceduresNow[25]) {
+            this->ECAMProceduresNow[43] = true;
+        }
+        if (this->ECAMProceduresNow[43] &&
+                this->ECAMProceduresNow[44]) {
+            this->ECAMProceduresNow[1] = true; //All feed tks level low
+        }
+
+
+        //Collector cells - appear || maintain (before >940kg)
+        if (this->tankLevels[11] < 780 || (this->ECAMProceduresPrevious[9] && this->tankLevels[11] < 940)) {
+            this->ECAMProceduresNow[9] = true;
+        }
+        if (this->tankLevels[12] < 780 || (this->ECAMProceduresPrevious[10] && this->tankLevels[12] < 940)) {
+            this->ECAMProceduresNow[10] = true;
+        }
+        if (this->tankLevels[13] < 780 || (this->ECAMProceduresPrevious[11] && this->tankLevels[13] < 940)) {
+            this->ECAMProceduresNow[11] = true;
+        }
+        if (this->tankLevels[14] < 780 || (this->ECAMProceduresPrevious[12] && this->tankLevels[14] < 940)) {
+            this->ECAMProceduresNow[12] = true;
+        }
+        
+
     }
 
     void FQMS::applyState() {
@@ -482,6 +543,7 @@ namespace PlaneFuelSystem {
             this->fuelSystem->setPumpState(i, this->commandedPumpStates[i]);
             if (this->fuelSystem->readPumpState(i) != this->commandedPumpStates[i]) {
                 this->pumpsFailStates[i] = 1;
+                this->processPmpFailuresECAM(i);
             }
         }
     }
@@ -637,5 +699,20 @@ namespace PlaneFuelSystem {
             return 1; //norm open
         }
     return 2; //abn closed/open
+    }
+
+
+    void FQMS::reportECAMProc() {
+        for (int i=0; i<103; i++) {
+            if (this->ECAMProceduresNow[i] == this->ECAMProceduresPrevious[i]) {
+                continue;
+            }
+            else if (this->ECAMProceduresNow[i]) {
+                //report true
+            }
+            else {
+                //report false
+            }
+        }
     }
 }

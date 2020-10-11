@@ -1,10 +1,23 @@
 #include <iostream>
-#include "FuelSystem/FuelSystem.h"
-#include "PlaneFuelSystem/SystemControl.h"
+#include "FUEL/FuelSystem/FuelSystem.h"
+#include "FUEL/PlaneFuelSystem/SystemControl.h"
 #include <chrono>
 #include <fstream>
+#include <cstring>
 
 int main() {
+
+    char* aa = (char*) malloc(100*sizeof(char));
+    strcpy(aa, u8"☐ -ALL TKs");
+    strcat(aa, u8"\n☑ -IDK HELP ME ........... OFF\n\n");
+    std::cout << aa << std::endl << std::endl;
+
+    std::ofstream file;
+    file.open("testu8.txt");
+    file << aa;
+    file.close();
+
+    /*
     std::cout << "Hello, World!" << std::endl;
     PlaneFuelSystem::SystemControl* s = new PlaneFuelSystem::SystemControl();
 

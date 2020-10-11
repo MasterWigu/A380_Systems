@@ -9,7 +9,7 @@
 #include "../../include/SDK/CHeaders/XPLM/XPLMDataAccess.h"
 #include "../../include/SDK/CHeaders/XPLM/XPLMPlugin.h"
 #include "../../include/SDK/CHeaders/XPLM/XPLMProcessing.h"
-#include "../PlaneFuelSystem/SystemControl.h"
+#include "../FUEL/PlaneFuelSystem/SystemControl.h"
 
 
 

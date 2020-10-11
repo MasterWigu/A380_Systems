@@ -22,37 +22,40 @@ namespace PlaneFuelSystem {
         bool fwdOccupied;
         bool aftOccupied;
 
-        bool* abnCases{};
+        bool* abnCases;
 
-        int* tankLevels{};
+        int* tankLevels;
 
-        int* commandedVlvStates{};
-        bool* commandedPumpStates{};
+        int* commandedVlvStates;
+        bool* commandedPumpStates;
 
-        int* vlvsFailStates{};
-        int* pumpsFailStates{};
-        bool* pumpsCockpitButtons{};
-        bool* xfrCockpitButtons{};
-        bool* crossFeedCockpit{};
+        int* vlvsFailStates;
+        int* pumpsFailStates;
+        bool* pumpsCockpitButtons;
+        bool* xfrCockpitButtons;
+        bool* crossFeedCockpit;
         bool emergValvesCockpit;
 
         bool* requestedLPValves;
 
-        bool* commandedTransfers{};
-        bool* lastTransfers{};
+        bool* commandedTransfers;
+        bool* lastTransfers;
+
+        bool* ECAMProceduresNow;
+        bool* ECAMProceduresPrevious;
 
         bool inFlight;
-        int FOB{};
+        int FOB;
         double CGTarget;
         int FL;
         float simTime;
         float lastSimTime;
 
         bool flWasAbove255;
-        double time80min{};
-        double time30min{};
-        double timeAbvFL255{};
-        double timeBlwFL245{};
+        double time80min;
+        double time30min;
+        double timeAbvFL255;
+        double timeBlwFL245;
 
         int* gravVlvsAux;
 
@@ -70,6 +73,9 @@ namespace PlaneFuelSystem {
         void applyState();
         void applyPumpState();
         void applyValveState();
+
+        void reportECAMProc();
+        void processPmpFailuresECAM(int id);
 
     public:
         FQMS(FuelSystem::FuelSystem *fS, FQDC *f);
@@ -93,6 +99,8 @@ namespace PlaneFuelSystem {
         int getGravVlvsStateECAM(int id);
 
         int getEmergVlvStateECAM(int id);
+
+        void processCumulativeECAMProc();
     };
 }
 

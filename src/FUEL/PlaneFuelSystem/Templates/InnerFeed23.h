@@ -8,7 +8,7 @@
 #include "Template.h"
 
 namespace PlaneFuelSystem {
-    class InnerFeed23: public Template{
+    class InnerFeed23: public Template {
     private:
         int* valveStates;
         int* pumpStates;
