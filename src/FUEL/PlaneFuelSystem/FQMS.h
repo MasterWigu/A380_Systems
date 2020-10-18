@@ -5,7 +5,10 @@
 #ifndef A380_SYSTEMS_FQMS_H
 #define A380_SYSTEMS_FQMS_H
 
+#include <cstdlib>
+#include <cmath>
 #include "../FuelSystem/FuelSystem.h"
+#include "FuelSystemFronend.h"
 #include "FQDC.h"
 #include "Templates/TemplateGetter.h"
 
@@ -16,6 +19,7 @@ namespace PlaneFuelSystem {
 
         FuelSystem::FuelSystem* fuelSystem;
         PlaneFuelSystem::FQDC* fqdc;
+        FuelSystemFronend* fronend;
 
         PlaneFuelSystem::TemplateGetter* templates;
 
@@ -78,7 +82,7 @@ namespace PlaneFuelSystem {
         void processPmpFailuresECAM(int id);
 
     public:
-        FQMS(FuelSystem::FuelSystem *fS, FQDC *f);
+        FQMS(FuelSystem::FuelSystem *fS, FQDC *f, PlaneFuelSystem::FuelSystemFronend* sFE);
 
         void updateLoop(int remMinutes, int GW, double currCG, float simulatorTime, int FL);
 

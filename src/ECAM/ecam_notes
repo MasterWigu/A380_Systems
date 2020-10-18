@@ -2,4 +2,10 @@ Procedure display size:
 		18 lines
 		41 characters/line
 
-
+Colors: 0 = White
+		1 = Grey
+		2 = Blue
+		3 = Green
+		4 = Amber
+		5 = Red
+		6 = Purple

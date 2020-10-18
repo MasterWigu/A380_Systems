@@ -11,7 +11,8 @@ namespace PlaneFuelSystem {
     PlaneFuelSystem::SystemControl::SystemControl() {
         this->fuelSystem = new FuelSystem::FuelSystem();
         this->fqdc = new PlaneFuelSystem::FQDC(this->fuelSystem);
-        this->fqms = new PlaneFuelSystem::FQMS(this->fuelSystem, this->fqdc);
+        this->frontend = new PlaneFuelSystem::FuelSystemFronend();
+        this->fqms = new PlaneFuelSystem::FQMS(this->fuelSystem, this->fqdc, this->frontend);
     }
 
     void SystemControl::update(int remMinutes, int GW, double currCG, float simulatorTime, int FL) {
@@ -21,6 +22,10 @@ namespace PlaneFuelSystem {
 
     FQMS* SystemControl::getFQMS() {
         return this->fqms;
+    }
+
+    FuelSystemFronend* SystemControl::getFuelFrontend() {
+        return this->frontend;
     }
 
 

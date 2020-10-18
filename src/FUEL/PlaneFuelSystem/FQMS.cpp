@@ -1,14 +1,13 @@
 //
 // Created by morei on 01/09/2020.
 //
-#include <cstdlib>
-#include <cmath>
 #include "FQMS.h"
 
 namespace PlaneFuelSystem {
-    FQMS::FQMS(FuelSystem::FuelSystem* fS, PlaneFuelSystem::FQDC* f) {
+    FQMS::FQMS(FuelSystem::FuelSystem* fS, PlaneFuelSystem::FQDC* f, PlaneFuelSystem::FuelSystemFronend* sFE) {
         this->fuelSystem = fS;
         this->fqdc = f;
+        this->fronend = sFE;
         this->arraysInit();
 
         this->templates = new TemplateGetter();
@@ -488,31 +487,7 @@ namespace PlaneFuelSystem {
             this->FOB += fqdcRead[i];
         }
 
-        //Sensing ECAM low level procedures
-        if (this->tankLevels[1] < 1375) {
-            this->ECAMProceduresNow[22] = true;
-        }
-        if (this->tankLevels[4] < 1375) {
-            this->ECAMProceduresNow[23] = true;
-        }
-        if (this->tankLevels[5] < 1375) {
-            this->ECAMProceduresNow[24] = true;
-        }
-        if (this->tankLevels[8] < 1375) {
-            this->ECAMProceduresNow[25] = true;
-        }
-        if (this->ECAMProceduresNow[22] &&
-            this->ECAMProceduresNow[23]) {
-            this->ECAMProceduresNow[42] = true;
-        }
-        if (this->ECAMProceduresNow[24] &&
-            this->ECAMProceduresNow[25]) {
-            this->ECAMProceduresNow[43] = true;
-        }
-        if (this->ECAMProceduresNow[43] &&
-                this->ECAMProceduresNow[44]) {
-            this->ECAMProceduresNow[1] = true; //All feed tks level low
-        }
+
 
 
         //Collector cells - appear || maintain (before >940kg)

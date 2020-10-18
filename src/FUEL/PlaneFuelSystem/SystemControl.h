@@ -15,11 +15,15 @@ namespace PlaneFuelSystem {
         FuelSystem::FuelSystem* fuelSystem;
         PlaneFuelSystem::FQDC* fqdc;
         PlaneFuelSystem::FQMS* fqms;
+        FuelSystemFronend *frontend;
     public:
         SystemControl();
 
         void update(int remMinutes, int GW, double currCG, float simulatorTime, int FL);
         FQMS* getFQMS();
+        FuelSystemFronend* getFuelFrontend();
+
+
     };
 
 }
