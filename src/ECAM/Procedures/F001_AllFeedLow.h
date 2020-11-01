@@ -6,7 +6,7 @@
 #define A380_SYSTEMS_F001_ALLFEEDLOW_H
 
 #include "ECAMProcedure.h"
-#include "../PlaneSystemsRefs.h"
+#include "../../PluginControl/PlaneSystemsRefs.h"
 
 namespace ECAM {
     class F001_AllFeedLow: ECAMProcedure {
@@ -20,9 +20,9 @@ namespace ECAM {
 
         ProcDisplayData* displayData;
         ProcPermInfo* permInfo;
-        PlaneSystemsRefs* planeSystems;
+        PluginControl::PlaneSystemsRefs* planeSystems;
 
-        F001_AllFeedLow(PlaneSystemsRefs* systems);
+        F001_AllFeedLow(PluginControl::PlaneSystemsRefs* systems);
         bool showProcedure(int linesToShow, bool selected, bool lastLineTicked);
 
         bool testProcedure();

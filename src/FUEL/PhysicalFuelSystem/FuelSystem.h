@@ -8,7 +8,7 @@
 #include "FuelBus.h"
 #include "EmergTransValve.h"
 
-namespace FuelSystem {
+namespace PhysicalFuelSystem {
     class FuelSystem {
     private:
 

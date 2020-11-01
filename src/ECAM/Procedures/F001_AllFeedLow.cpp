@@ -6,7 +6,7 @@
 #include "F001_AllFeedLow.h"
 
 namespace ECAM {
-    F001_AllFeedLow::F001_AllFeedLow(ECAM::PlaneSystemsRefs* systems) {
+    F001_AllFeedLow::F001_AllFeedLow(PluginControl::PlaneSystemsRefs* systems) {
         this->planeSystems = systems;
         this->displayData = new ProcDisplayData();
         this->permInfo = new ProcPermInfo();
@@ -91,7 +91,7 @@ namespace ECAM {
     }
 
     bool F001_AllFeedLow::testProcedure() {
-        double* levels = this->planeSystems->fuelSystem->getTankLevels();
+        double* levels = nullptr; //this->planeSystems->fuelSystem->getTankLevels();
 
         //put condition(s) here!
         if (levels[1] < 1375 && levels[4] < 1375 && levels[5] < 1375 && levels[8] < 1375) {
@@ -198,7 +198,7 @@ namespace ECAM {
         }
 
 
-        tkQty = this->planeSystems->fuelSystem->getTankLevels();
+        tkQty = nullptr;//this->planeSystems->fuelSystem->getTankLevels();
 
         if (tkQty[0] > 100 || tkQty[9] > 100) { //if outer has fuel
             if (this->displayData->selectedLine < linesToShow) {

@@ -1,6 +1,5 @@
 #include <iostream>
-#include "FUEL/FuelSystem/FuelSystem.h"
-#include "FUEL/PlaneFuelSystem/SystemControl.h"
+#include "FUEL/SystemControl.h"
 #include <chrono>
 #include <fstream>
 #include <cstring>

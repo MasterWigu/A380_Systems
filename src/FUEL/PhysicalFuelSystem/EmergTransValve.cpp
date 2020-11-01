@@ -4,7 +4,7 @@
 
 #include "EmergTransValve.h"
 
-FuelSystem::EmergTansValve::EmergTansValve(FuelSystem::FuelTank *upper, FuelSystem::FuelTank *lower) {
+PhysicalFuelSystem::EmergTansValve::EmergTansValve(PhysicalFuelSystem::FuelTank *upper, PhysicalFuelSystem::FuelTank *lower) {
     this->rate = 10000; //I had to guess a value
     this->state = 0;
     this->commandedState = 0;
@@ -13,17 +13,17 @@ FuelSystem::EmergTansValve::EmergTansValve(FuelSystem::FuelTank *upper, FuelSyst
     this->lower = lower;
 }
 
-void FuelSystem::EmergTansValve::setState(int nState) {
+void PhysicalFuelSystem::EmergTansValve::setState(int nState) {
     this->commandedState = nState;
     if (this->isPowered)
         this->state = nState;
 }
 
-int FuelSystem::EmergTansValve::getState() {
+int PhysicalFuelSystem::EmergTansValve::getState() {
     return this->state;
 }
 
-void FuelSystem::EmergTansValve::transfer() {
+void PhysicalFuelSystem::EmergTansValve::transfer() {
     if (state == 1) { //only if valve is open
         double valueToTransfer = this->upper->getFuel();
         if (valueToTransfer > this->rate) valueToTransfer = this->rate;
@@ -32,12 +32,12 @@ void FuelSystem::EmergTansValve::transfer() {
     }
 }
 
-void FuelSystem::EmergTansValve::setPower(bool p) {
+void PhysicalFuelSystem::EmergTansValve::setPower(bool p) {
     this->isPowered = p;
     if (p)
         this->state = this->commandedState;
 }
 
-bool FuelSystem::EmergTansValve::getPower() {
+bool PhysicalFuelSystem::EmergTansValve::getPower() {
     return this->isPowered;
 }

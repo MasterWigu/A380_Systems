@@ -5,16 +5,17 @@
 #ifndef A380_SYSTEMS_PLANESYSTEMSREFS_H
 #define A380_SYSTEMS_PLANESYSTEMSREFS_H
 
-#include "../FUEL/PlaneFuelSystem/SystemControl.h"
+#include "../FUEL/SystemControl.h"
 #include "../COCKPIT/CockpitControls.h"
+#include "../ECAM/ECAMSystemControl.h"
 
-namespace ECAM {
+namespace PluginControl {
     class PlaneSystemsRefs {
     public:
-        PlaneFuelSystem::FuelSystemFronend* fuelSystem;
+        FuelSystem::SystemControl* fuelSystem;
+        ECAM::ECAMSystemControl* ecamSystem;
         Cockpit::CockpitControls* cockpitControls;
 
-        PlaneSystemsRefs(Cockpit::CockpitControls* cC, PlaneFuelSystem::FuelSystemFronend* fFE);
     };
 }
 

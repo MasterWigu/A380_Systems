@@ -5,7 +5,7 @@
 #ifndef UNTITLED_FUELCONSUMER_H
 #define UNTITLED_FUELCONSUMER_H
 
-namespace FuelSystem {
+namespace PhysicalFuelSystem {
     class FuelConsumer {
     private:
         double rate;

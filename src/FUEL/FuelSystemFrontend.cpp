@@ -2,14 +2,14 @@
 // Created by morei on 17/10/2020.
 //
 
-#include "FuelSystemFronend.h"
+#include "FuelSystemFrontend.h"
 
-namespace PlaneFuelSystem {
-    double *FuelSystemFronend::getTankLevels() {
+namespace FuelSystem {
+    double *FuelSystemFrontend::getTankLevels() {
         return this->tankLevels;
     }
 
-    void FuelSystemFronend::setTankLevels(double *levels) {
+    void FuelSystemFrontend::setTankLevels(double *levels) {
         for (int i=0; i<15; i++)
             this->tankLevels[i] = levels[i];
     }

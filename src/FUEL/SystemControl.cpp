@@ -5,13 +5,11 @@
 #include "SystemControl.h"
 
 
-namespace PlaneFuelSystem {
-
-
-    PlaneFuelSystem::SystemControl::SystemControl() {
-        this->fuelSystem = new FuelSystem::FuelSystem();
+namespace FuelSystem {
+    FuelSystem::SystemControl::SystemControl() {
+        this->fuelSystem = new PhysicalFuelSystem::FuelSystem();
         this->fqdc = new PlaneFuelSystem::FQDC(this->fuelSystem);
-        this->frontend = new PlaneFuelSystem::FuelSystemFronend();
+        this->frontend = new FuelSystem::FuelSystemFrontend();
         this->fqms = new PlaneFuelSystem::FQMS(this->fuelSystem, this->fqdc, this->frontend);
     }
 
@@ -20,12 +18,16 @@ namespace PlaneFuelSystem {
         this->fqms->updateLoop(remMinutes, GW, currCG, simulatorTime, FL);
     }
 
-    FQMS* SystemControl::getFQMS() {
+    PlaneFuelSystem::FQMS* SystemControl::getFQMS() {
         return this->fqms;
     }
 
-    FuelSystemFronend* SystemControl::getFuelFrontend() {
+    FuelSystemFrontend* SystemControl::getFuelFrontend() {
         return this->frontend;
+    }
+
+    void SystemControl::setPlaneFrontends(PluginControl::PlaneSystemsFrontends* psf) {
+        this->planeSysFEs = psf;
     }
 
 

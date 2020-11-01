@@ -4,19 +4,19 @@
 
 #include "FuelTank.h"
 
-namespace FuelSystem {
+namespace PhysicalFuelSystem {
 
-    FuelSystem::FuelTank::FuelTank(double capacity) {
+    PhysicalFuelSystem::FuelTank::FuelTank(double capacity) {
         this->capacityKg = capacity;
         this->collectorCapacity = 0;
     }
 
-    FuelSystem::FuelTank::FuelTank(double capacity, double collCap) {
+    PhysicalFuelSystem::FuelTank::FuelTank(double capacity, double collCap) {
         this->capacityKg = capacity;
         this->collectorCapacity = collCap;
     }
 
-    void FuelSystem::FuelTank::setFuel(double fuelKg) {
+    void PhysicalFuelSystem::FuelTank::setFuel(double fuelKg) {
         this->currFuelKg = fuelKg;
     }
 
@@ -41,7 +41,7 @@ namespace FuelSystem {
         return 0;
     }
 
-    double FuelSystem::FuelTank::removeFuel(double amount) {
+    double PhysicalFuelSystem::FuelTank::removeFuel(double amount) {
         if (this->currFuelKg - this->collectorCapacity - amount < 0) {
             double temp = this->currFuelKg - this->collectorCapacity;  //temp is the fuel we could remove until tank empty
             this->currFuelKg = 0;
@@ -52,7 +52,7 @@ namespace FuelSystem {
         return amount;
     }
 
-    double FuelSystem::FuelTank::removeFuelCollector(double amount) {
+    double PhysicalFuelSystem::FuelTank::removeFuelCollector(double amount) {
         if (this->currFuelKg - amount < 0) {
             double temp = this->currFuelKg;  //temp is the fuel we could remove until tank empty
             this->currFuelKg = 0;

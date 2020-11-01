@@ -5,15 +5,19 @@
 #ifndef A380_SYSTEMS_ECAMSYSTEMCONTROL_H
 #define A380_SYSTEMS_ECAMSYSTEMCONTROL_H
 
-#include "../FUEL/PlaneFuelSystem/FuelSystemFronend.h"
-#include "PlaneSystemsRefs.h"
+#include "../FUEL/FuelSystemFrontend.h"
+#include "../PluginControl/PlaneSystemsFrontends.h"
 
 namespace ECAM {
+
     class ECAMSystemControl {
-    private:
-        PlaneSystemsRefs* planeSystems;
     public:
-        ECAMSystemControl(Cockpit::CockpitControls* cC, PlaneFuelSystem::FuelSystemFronend* fFE);
+        PluginControl::PlaneSystemsFrontends* planeSysFEs;
+
+
+        void setPlaneFrontends(PluginControl::PlaneSystemsFrontends* psf);
+
+        void update();
     };
 }
 

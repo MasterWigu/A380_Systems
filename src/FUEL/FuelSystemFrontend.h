@@ -2,11 +2,11 @@
 // Created by morei on 17/10/2020.
 //
 
-#ifndef A380_SYSTEMS_FUELSYSTEMFRONEND_H
-#define A380_SYSTEMS_FUELSYSTEMFRONEND_H
+#ifndef A380_SYSTEMS_FUELSYSTEMFRONTEND_H
+#define A380_SYSTEMS_FUELSYSTEMFRONTEND_H
 
-namespace PlaneFuelSystem {
-    class FuelSystemFronend {
+namespace FuelSystem {
+    class FuelSystemFrontend {
     private:
         double* tankLevels;
     public:
@@ -16,4 +16,4 @@ namespace PlaneFuelSystem {
 }
 
 
-#endif //A380_SYSTEMS_FUELSYSTEMFRONEND_H
+#endif //A380_SYSTEMS_FUELSYSTEMFRONTEND_H

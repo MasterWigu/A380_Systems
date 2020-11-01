@@ -7,8 +7,8 @@
 
 #include <cstdlib>
 #include <cmath>
-#include "../FuelSystem/FuelSystem.h"
-#include "FuelSystemFronend.h"
+#include "../PhysicalFuelSystem/FuelSystem.h"
+#include "../FuelSystemFrontend.h"
 #include "FQDC.h"
 #include "Templates/TemplateGetter.h"
 
@@ -17,9 +17,9 @@ namespace PlaneFuelSystem {
     private:
         int* feedTks;
 
-        FuelSystem::FuelSystem* fuelSystem;
+        PhysicalFuelSystem::FuelSystem* fuelSystem;
         PlaneFuelSystem::FQDC* fqdc;
-        FuelSystemFronend* fronend;
+        FuelSystem::FuelSystemFrontend* frontend;
 
         PlaneFuelSystem::TemplateGetter* templates;
 
@@ -82,7 +82,7 @@ namespace PlaneFuelSystem {
         void processPmpFailuresECAM(int id);
 
     public:
-        FQMS(FuelSystem::FuelSystem *fS, FQDC *f, PlaneFuelSystem::FuelSystemFronend* sFE);
+        FQMS(PhysicalFuelSystem::FuelSystem *fS, FQDC *f, FuelSystem::FuelSystemFrontend* sFE);
 
         void updateLoop(int remMinutes, int GW, double currCG, float simulatorTime, int FL);
 

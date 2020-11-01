@@ -4,8 +4,8 @@
 
 #include "FuelBusValve.h"
 
-namespace FuelSystem {
-    FuelSystem::FuelBusValve::FuelBusValve(FuelSystem::FuelBus* location1, FuelSystem::FuelBus* location2) {
+namespace PhysicalFuelSystem {
+    PhysicalFuelSystem::FuelBusValve::FuelBusValve(PhysicalFuelSystem::FuelBus* location1, PhysicalFuelSystem::FuelBus* location2) {
         this->bus1 = location1;
         this->bus2 = location2;
         this->state = 0;
@@ -13,7 +13,7 @@ namespace FuelSystem {
         this->isPowered = false;
     }
 
-    void FuelSystem::FuelBusValve::setState(int nState) {
+    void PhysicalFuelSystem::FuelBusValve::setState(int nState) {
         this->commandedState = nState;
         if (this->isPowered) //if the valve is not powered, cant change state
             this->state = nState;

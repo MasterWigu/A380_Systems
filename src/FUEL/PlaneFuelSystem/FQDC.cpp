@@ -5,7 +5,7 @@
 #include "FQDC.h"
 
 namespace PlaneFuelSystem {
-    FQDC::FQDC(FuelSystem::FuelSystem *fS) {
+    FQDC::FQDC(PhysicalFuelSystem::FuelSystem *fS) {
         this->fuelSystem = fS;
         this->AGPFailed = false;
     }

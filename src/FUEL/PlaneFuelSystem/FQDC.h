@@ -5,16 +5,16 @@
 #ifndef A380_SYSTEMS_FQDC_H
 #define A380_SYSTEMS_FQDC_H
 
-#include "../FuelSystem/FuelSystem.h"
+#include "../PhysicalFuelSystem/FuelSystem.h"
 #include <cmath>
 
 namespace PlaneFuelSystem {
     class FQDC {
     private:
-        FuelSystem::FuelSystem* fuelSystem;
+        PhysicalFuelSystem::FuelSystem* fuelSystem;
         bool AGPFailed;
     public:
-        FQDC(FuelSystem::FuelSystem* fS);
+        FQDC(PhysicalFuelSystem::FuelSystem* fS);
 
         int readQuantitySensorDirect(int id);
 

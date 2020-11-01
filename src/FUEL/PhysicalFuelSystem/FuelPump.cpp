@@ -5,8 +5,8 @@
 #include "FuelPump.h"
 
 
-namespace FuelSystem {
-    FuelSystem::FuelPump::FuelPump(FuelSystem::FuelTank* location, int rate, bool iF) {
+namespace PhysicalFuelSystem {
+    PhysicalFuelSystem::FuelPump::FuelPump(PhysicalFuelSystem::FuelTank* location, int rate, bool iF) {
         this->maxPumpRate = rate;
         this->pumpLocation = location;
         this->state = 0;

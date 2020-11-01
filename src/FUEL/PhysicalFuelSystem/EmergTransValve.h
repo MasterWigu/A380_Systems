@@ -7,7 +7,7 @@
 
 #include "FuelTank.h"
 
-namespace FuelSystem {
+namespace PhysicalFuelSystem {
     class EmergTansValve {
     private:
         int state = 0; // 0=Closed, 1=Opened
@@ -15,10 +15,10 @@ namespace FuelSystem {
         bool isPowered;
         double rate;
 
-        FuelSystem::FuelTank* upper;
-        FuelSystem::FuelTank* lower;
+        PhysicalFuelSystem::FuelTank* upper;
+        PhysicalFuelSystem::FuelTank* lower;
     public:
-        EmergTansValve(FuelSystem::FuelTank *upper, FuelSystem::FuelTank *lower);
+        EmergTansValve(PhysicalFuelSystem::FuelTank *upper, PhysicalFuelSystem::FuelTank *lower);
         void setState(int nState);
         int getState();
 

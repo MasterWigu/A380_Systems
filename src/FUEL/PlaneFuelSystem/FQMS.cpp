@@ -4,10 +4,10 @@
 #include "FQMS.h"
 
 namespace PlaneFuelSystem {
-    FQMS::FQMS(FuelSystem::FuelSystem* fS, PlaneFuelSystem::FQDC* f, PlaneFuelSystem::FuelSystemFronend* sFE) {
+    FQMS::FQMS(PhysicalFuelSystem::FuelSystem* fS, PlaneFuelSystem::FQDC* f, FuelSystem::FuelSystemFrontend* sFE) {
         this->fuelSystem = fS;
         this->fqdc = f;
-        this->fronend = sFE;
+        this->frontend = sFE;
         this->arraysInit();
 
         this->templates = new TemplateGetter();
@@ -302,7 +302,7 @@ namespace PlaneFuelSystem {
 
             if (remTimeMins < 90) {
                 if (this->tankLevels[1] < 16560 || this->tankLevels[8] < 16560 ||
-                        (this->lastTransfers[innOrMid] && (this->tankLevels[1] < 17560 || this->tankLevels[8] < 17560 ))) {
+                    (this->lastTransfers[innOrMid] && (this->tankLevels[1] < 17560 || this->tankLevels[8] < 17560 ))) {
                     this->commandedTransfers[innOrMid] = true;
                     this->fwdOccupied = true;
                 }
@@ -428,8 +428,8 @@ namespace PlaneFuelSystem {
     void FQMS::applyTransfers() {
         int **result;
         for (int i = 0; i < 14; i++) {
-                    if (this->commandedTransfers[i]) {
-                        result = this->templates->getTemplate(i, this->tankLevels, this->pumpsFailStates, this->vlvsFailStates,
+            if (this->commandedTransfers[i]) {
+                result = this->templates->getTemplate(i, this->tankLevels, this->pumpsFailStates, this->vlvsFailStates,
                                                       this->abnCases, true, false);
 
                 if (result != nullptr) {
@@ -446,36 +446,36 @@ namespace PlaneFuelSystem {
 
     void FQMS::getTankLevels() {
         int fqdcRead[] = {this->fqdc->readQuantitySensorAGP(0),
-                         this->fqdc->readQuantitySensorAGP(1),
-                         this->fqdc->readQuantitySensorAGP(2),
-                         this->fqdc->readQuantitySensorAGP(3),
-                         this->fqdc->readQuantitySensorAGP(4),
-                         this->fqdc->readQuantitySensorAGP(5),
-                         this->fqdc->readQuantitySensorAGP(6),
-                         this->fqdc->readQuantitySensorAGP(7),
-                         this->fqdc->readQuantitySensorAGP(8),
-                         this->fqdc->readQuantitySensorAGP(9),
-                         this->fqdc->readQuantitySensorAGP(10),
-                         this->fqdc->readQuantitySensorAGP(11),
-                         this->fqdc->readQuantitySensorAGP(12),
-                         this->fqdc->readQuantitySensorAGP(13),
-                         this->fqdc->readQuantitySensorAGP(14)};
+                          this->fqdc->readQuantitySensorAGP(1),
+                          this->fqdc->readQuantitySensorAGP(2),
+                          this->fqdc->readQuantitySensorAGP(3),
+                          this->fqdc->readQuantitySensorAGP(4),
+                          this->fqdc->readQuantitySensorAGP(5),
+                          this->fqdc->readQuantitySensorAGP(6),
+                          this->fqdc->readQuantitySensorAGP(7),
+                          this->fqdc->readQuantitySensorAGP(8),
+                          this->fqdc->readQuantitySensorAGP(9),
+                          this->fqdc->readQuantitySensorAGP(10),
+                          this->fqdc->readQuantitySensorAGP(11),
+                          this->fqdc->readQuantitySensorAGP(12),
+                          this->fqdc->readQuantitySensorAGP(13),
+                          this->fqdc->readQuantitySensorAGP(14)};
 
         int directRead[] = {this->fqdc->readQuantitySensorDirect(0),
-                           this->fqdc->readQuantitySensorDirect(1),
-                           this->fqdc->readQuantitySensorDirect(2),
-                           this->fqdc->readQuantitySensorDirect(3),
-                           this->fqdc->readQuantitySensorDirect(4),
-                           this->fqdc->readQuantitySensorDirect(5),
-                           this->fqdc->readQuantitySensorDirect(6),
-                           this->fqdc->readQuantitySensorDirect(7),
-                           this->fqdc->readQuantitySensorDirect(8),
-                           this->fqdc->readQuantitySensorDirect(9),
-                           this->fqdc->readQuantitySensorDirect(10),
-                           this->fqdc->readQuantitySensorDirect(11),
-                           this->fqdc->readQuantitySensorDirect(12),
-                           this->fqdc->readQuantitySensorDirect(13),
-                           this->fqdc->readQuantitySensorDirect(14)};
+                            this->fqdc->readQuantitySensorDirect(1),
+                            this->fqdc->readQuantitySensorDirect(2),
+                            this->fqdc->readQuantitySensorDirect(3),
+                            this->fqdc->readQuantitySensorDirect(4),
+                            this->fqdc->readQuantitySensorDirect(5),
+                            this->fqdc->readQuantitySensorDirect(6),
+                            this->fqdc->readQuantitySensorDirect(7),
+                            this->fqdc->readQuantitySensorDirect(8),
+                            this->fqdc->readQuantitySensorDirect(9),
+                            this->fqdc->readQuantitySensorDirect(10),
+                            this->fqdc->readQuantitySensorDirect(11),
+                            this->fqdc->readQuantitySensorDirect(12),
+                            this->fqdc->readQuantitySensorDirect(13),
+                            this->fqdc->readQuantitySensorDirect(14)};
 
         this->FOB = 0;
         for (int i = 0; i< 15; i++) {
@@ -503,7 +503,7 @@ namespace PlaneFuelSystem {
         if (this->tankLevels[14] < 780 || (this->ECAMProceduresPrevious[12] && this->tankLevels[14] < 940)) {
             this->ECAMProceduresNow[12] = true;
         }
-        
+
 
     }
 
@@ -598,9 +598,9 @@ namespace PlaneFuelSystem {
 
     int FQMS::getTrimVlvStateECAM() {
         if (((this->vlvsFailStates[37] == 0 || this->vlvsFailStates[37] == 1) && this->commandedVlvStates[37] != 0) ||
-                ((this->vlvsFailStates[38] == 0 || this->vlvsFailStates[38] == 1) && this->commandedVlvStates[38] != 0) ||
-                ((this->vlvsFailStates[20] == 0 || this->vlvsFailStates[20] == 1) && this->commandedVlvStates[20] != 0) ||
-                ((this->vlvsFailStates[21] == 0 || this->vlvsFailStates[21] == 1) && this->commandedVlvStates[21] != 0)) {
+            ((this->vlvsFailStates[38] == 0 || this->vlvsFailStates[38] == 1) && this->commandedVlvStates[38] != 0) ||
+            ((this->vlvsFailStates[20] == 0 || this->vlvsFailStates[20] == 1) && this->commandedVlvStates[20] != 0) ||
+            ((this->vlvsFailStates[21] == 0 || this->vlvsFailStates[21] == 1) && this->commandedVlvStates[21] != 0)) {
             return 0; //Not isolated
         }
         if (((this->vlvsFailStates[37] == 0 || this->vlvsFailStates[37] == 2) && this->commandedVlvStates[37] == 0) &&
@@ -623,15 +623,15 @@ namespace PlaneFuelSystem {
         //TODO check if case of valve 20 is working
         if (id == 20) {
             if ((this->vlvsFailStates[20] == 0 || this->vlvsFailStates[20] == 2) && (this->commandedVlvStates[20]==0 || this->commandedVlvStates[20]==2 || this->commandedVlvStates[20]==4) &&
-                    (this->vlvsFailStates[21] == 0 || this->vlvsFailStates[21] == 2) && (this->commandedVlvStates[21]==0 || this->commandedVlvStates[21]==2 || this->commandedVlvStates[21]==4)) {
+                (this->vlvsFailStates[21] == 0 || this->vlvsFailStates[21] == 2) && (this->commandedVlvStates[21]==0 || this->commandedVlvStates[21]==2 || this->commandedVlvStates[21]==4)) {
                 return 0; //no transfer
             }
             if ((this->vlvsFailStates[20] == 0 || this->vlvsFailStates[20] == 1) && this->commandedVlvStates[20]==1 &&
-                    (this->vlvsFailStates[21] == 0 || this->vlvsFailStates[21] == 1) && this->commandedVlvStates[21]==1) {
+                (this->vlvsFailStates[21] == 0 || this->vlvsFailStates[21] == 1) && this->commandedVlvStates[21]==1) {
                 return 1; //auto transfer
             }
             if ((this->vlvsFailStates[20] == 0 || this->vlvsFailStates[20] == 1) && this->commandedVlvStates[20]==3 ||
-                    (this->vlvsFailStates[21] == 0 || this->vlvsFailStates[21] == 1) && this->commandedVlvStates[21]==3) {
+                (this->vlvsFailStates[21] == 0 || this->vlvsFailStates[21] == 1) && this->commandedVlvStates[21]==3) {
                 return 2; //manual transfer
             }
             return 3;
@@ -673,7 +673,7 @@ namespace PlaneFuelSystem {
         if ((this->vlvsFailStates[id+28] == 0 || this->vlvsFailStates[id+28] == 1) && (this->commandedVlvStates[id+28]==1 || this->commandedVlvStates[id+28]==3)) {
             return 1; //norm open
         }
-    return 2; //abn closed/open
+        return 2; //abn closed/open
     }
 
 

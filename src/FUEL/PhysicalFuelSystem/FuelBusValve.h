@@ -6,7 +6,7 @@
 #define UNTITLED_FUELBUSVALVE_H
 
 
-namespace FuelSystem {
+namespace PhysicalFuelSystem {
     class FuelBus;
 
     class FuelBusValve {
@@ -15,10 +15,10 @@ namespace FuelSystem {
         int commandedState;
         bool isPowered;
 
-        FuelSystem::FuelBus* bus1;
-        FuelSystem::FuelBus* bus2;
+        PhysicalFuelSystem::FuelBus* bus1;
+        PhysicalFuelSystem::FuelBus* bus2;
     public:
-        FuelBusValve(FuelSystem::FuelBus *location1, FuelSystem::FuelBus *location2);
+        FuelBusValve(PhysicalFuelSystem::FuelBus *location1, PhysicalFuelSystem::FuelBus *location2);
         void setState(int nState);
         int getState();
 

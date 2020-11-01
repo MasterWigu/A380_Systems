@@ -4,7 +4,7 @@
 
 #ifndef FUELTANK_H
 #define FUELTANK_H
-namespace FuelSystem {
+namespace PhysicalFuelSystem {
     class FuelTank {
     private:
         double capacityKg = -1;

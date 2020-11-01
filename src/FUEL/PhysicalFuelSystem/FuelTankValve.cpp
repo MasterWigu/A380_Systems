@@ -4,16 +4,16 @@
 
 #include "FuelTankValve.h"
 
-namespace FuelSystem {
+namespace PhysicalFuelSystem {
 
-    FuelSystem::FuelTankValve::FuelTankValve(FuelSystem::FuelTank *location) {
+    PhysicalFuelSystem::FuelTankValve::FuelTankValve(PhysicalFuelSystem::FuelTank *location) {
         this->valveLocation = location;
         this->state = 0;
         this->isPowered = false;
         this->commandedState = 0;
     }
 
-    FuelTankValve::FuelTankValve(FuelSystem::FuelTank *location, double feedRate) {
+    FuelTankValve::FuelTankValve(PhysicalFuelSystem::FuelTank *location, double feedRate) {
         this->valveLocation = location;
         this->state = 0;
         this->commandedState = 0;
@@ -21,7 +21,7 @@ namespace FuelSystem {
         this->gravFeedRate = feedRate;
     }
 
-    void FuelSystem::FuelTankValve::setState(int nState) {
+    void PhysicalFuelSystem::FuelTankValve::setState(int nState) {
         this->commandedState = nState;
         if (this->isPowered) //if the valve is not powered, cant change state
             this->state = nState;

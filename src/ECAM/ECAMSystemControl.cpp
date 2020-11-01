@@ -5,9 +5,11 @@
 #include "ECAMSystemControl.h"
 
 namespace ECAM {
-    ECAMSystemControl::ECAMSystemControl(Cockpit::CockpitControls* cC, PlaneFuelSystem::FuelSystemFronend *fFE) {
-        this->planeSystems = new PlaneSystemsRefs(cC, fFE);
-        //TODO add other systems here as argument
+    void ECAMSystemControl::setPlaneFrontends(PluginControl::PlaneSystemsFrontends* psf) {
+        this->planeSysFEs = psf;
     }
 
+    void ECAMSystemControl::update() {
+
+    }
 }

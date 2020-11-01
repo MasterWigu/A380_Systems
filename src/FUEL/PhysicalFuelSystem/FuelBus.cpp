@@ -7,7 +7,7 @@
 
 
 
-FuelSystem::FuelBus::FuelBus(int bNum, FuelSystem::FuelPump **pumps, int nPumps, FuelSystem::FuelTankValve **tankValves, int nTValves, FuelSystem::FuelConsumer** consumers, int nCons) {
+PhysicalFuelSystem::FuelBus::FuelBus(int bNum, PhysicalFuelSystem::FuelPump **pumps, int nPumps, PhysicalFuelSystem::FuelTankValve **tankValves, int nTValves, PhysicalFuelSystem::FuelConsumer** consumers, int nCons) {
     this->busNum = bNum;
     this->efectiveBusNum = 0;
 
@@ -27,7 +27,7 @@ FuelSystem::FuelBus::FuelBus(int bNum, FuelSystem::FuelPump **pumps, int nPumps,
     }
     this->numTankValves = nTValves;
 
-    this->gravFeedAmounts = (double*) malloc(nTValves*sizeof(double));;
+    this->gravFeedAmounts = (double*) malloc(nTValves*sizeof(double));
     for (int i = 0; i<nTValves; i++)
         this->gravFeedAmounts[i] = 0.0;
 
@@ -40,7 +40,7 @@ FuelSystem::FuelBus::FuelBus(int bNum, FuelSystem::FuelPump **pumps, int nPumps,
     this->totalPumpGravFuel = 0.0;
 }
 
-double FuelSystem::FuelBus::getMaxAvailPumped(float deltaTime) {
+double PhysicalFuelSystem::FuelBus::getMaxAvailPumped(float deltaTime) {
     double availKg = 0.0;
 
     for (int i = 0; i<this->numPumps; i++) {
@@ -58,12 +58,12 @@ double FuelSystem::FuelBus::getMaxAvailPumped(float deltaTime) {
 
 }
 
-double FuelSystem::FuelBus::getMaxAvailGravity(float deltaTime) {
+double PhysicalFuelSystem::FuelBus::getMaxAvailGravity(float deltaTime) {
     // This function can only be called after getMaxAvailPumped and only if that returned 0!!!!
     double availKg = 0;
 
     for (int i = 0; i<this->numTankValves; i++) {
-        this->gravFeedAmounts[i] = this->tankValvesList[i]->getGravFeedable(0);
+        this->gravFeedAmounts[i] = this->tankValvesList[i]->getGravFeedable(deltaTime);
         availKg += this->gravFeedAmounts[i];
     }
 
@@ -71,7 +71,7 @@ double FuelSystem::FuelBus::getMaxAvailGravity(float deltaTime) {
     return availKg;
 }
 
-double FuelSystem::FuelBus::distribute(double amount, float deltaTime) {
+double PhysicalFuelSystem::FuelBus::distribute(double amount, float deltaTime) {
     //consumers have priority always
     for (int i = 0; i<this->numConsumers; i++) {
         if (this->consumersList[i]->canConsume()) {
@@ -104,7 +104,7 @@ double FuelSystem::FuelBus::distribute(double amount, float deltaTime) {
     return amount;
 }
 
-double FuelSystem::FuelBus::pump(double amount) {
+double PhysicalFuelSystem::FuelBus::pump(double amount) {
     double percentage = amount / this->totalPumpGravFuel;
 
     double aux = 0;
@@ -124,19 +124,19 @@ double FuelSystem::FuelBus::pump(double amount) {
     return amount;
 }
 
-int FuelSystem::FuelBus::getBusNum() {
+int PhysicalFuelSystem::FuelBus::getBusNum() {
     return this->busNum;
 }
 
-void FuelSystem::FuelBus::setEfBusNum(int bNum) {
+void PhysicalFuelSystem::FuelBus::setEfBusNum(int bNum) {
     this->efectiveBusNum = bNum;
 }
 
-int FuelSystem::FuelBus::getEfBusNum() {
+int PhysicalFuelSystem::FuelBus::getEfBusNum() {
     return this->efectiveBusNum;
 }
 
-void FuelSystem::FuelBus::setBusValves(FuelSystem::FuelBusValve **bValves, int nBValves) {
+void PhysicalFuelSystem::FuelBus::setBusValves(PhysicalFuelSystem::FuelBusValve **bValves, int nBValves) {
     this->busValvesList = (FuelBusValve**) malloc(nBValves * sizeof(FuelBusValve*));
     for (int i=0; i<nBValves; i++) {
         this->busValvesList[i] = bValves[i];
@@ -144,15 +144,15 @@ void FuelSystem::FuelBus::setBusValves(FuelSystem::FuelBusValve **bValves, int n
     this->numBusValves = nBValves;
 }
 
-FuelSystem::FuelBusValve **FuelSystem::FuelBus::getBusValves() {
+PhysicalFuelSystem::FuelBusValve **PhysicalFuelSystem::FuelBus::getBusValves() {
     return this->busValvesList;
 }
 
-int FuelSystem::FuelBus::getNumBusValves() {
+int PhysicalFuelSystem::FuelBus::getNumBusValves() {
     return this->numBusValves;
 }
 
-FuelSystem::FuelBus::~FuelBus() {
+PhysicalFuelSystem::FuelBus::~FuelBus() {
     free(this->pumpsList);
     free(this->tankValvesList);
     free(this->consumersList);

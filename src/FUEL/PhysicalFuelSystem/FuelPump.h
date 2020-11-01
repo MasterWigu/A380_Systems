@@ -7,7 +7,7 @@
 #include "FuelTank.h"
 
 
-namespace FuelSystem{
+namespace PhysicalFuelSystem{
     class FuelPump {
     private:
         double maxPumpRate = 0; //In kg/h
@@ -17,10 +17,10 @@ namespace FuelSystem{
         bool isFailed;
         bool isFeed;
 
-        FuelSystem::FuelTank* pumpLocation;
+        PhysicalFuelSystem::FuelTank* pumpLocation;
 
     public:
-        FuelPump(FuelSystem::FuelTank* location, int rate, bool iF);
+        FuelPump(PhysicalFuelSystem::FuelTank* location, int rate, bool iF);
         double getPumpable(float deltaTime);
         bool canPump();
         void pumpFuel(double amount);

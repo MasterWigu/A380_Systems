@@ -4,7 +4,7 @@
 
 #include "FuelConsumer.h"
 
-namespace FuelSystem {
+namespace PhysicalFuelSystem {
 
     FuelConsumer::FuelConsumer(double r) {
         this->state = 0; // Starts closed

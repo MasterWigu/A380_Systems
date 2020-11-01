@@ -5,7 +5,7 @@
 #include "PluginControl.h"
 
 
-PlaneFuelSystem::SystemControl* systemControl;
+FuelSystem::SystemControl* systemControl;
 PlaneFuelSystem::FQMS* fqms;
 
 //NEEDED DATAREFS
@@ -43,7 +43,7 @@ PLUGIN_API int XPluginStart(char* outName, char* outSig, char* outDesc) {
     strcpy(outDesc, "Plugin that manages all fuel transfers in the A380");
 
     //CREATE SYSTEM
-    systemControl = new PlaneFuelSystem::SystemControl();
+    systemControl = new FuelSystem::SystemControl();
     fqms = systemControl->getFQMS();
 
 

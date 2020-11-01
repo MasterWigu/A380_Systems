@@ -5,7 +5,7 @@
 #include "FuelSystem.h"
 #include <iostream>
 
-namespace FuelSystem {
+namespace PhysicalFuelSystem {
     FuelSystem::FuelSystem() {
         //TODO express rates in kg/min
         this->tanks = (FuelTank**) malloc(11 * sizeof(FuelTank*));

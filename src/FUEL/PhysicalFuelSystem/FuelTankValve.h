@@ -6,18 +6,18 @@
 #define UNTITLED_FUELTANKVALVE_H
 #include "FuelTank.h"
 
-namespace FuelSystem {
+namespace PhysicalFuelSystem {
     class FuelTankValve {
     private:
-        FuelSystem::FuelTank* valveLocation;
+        PhysicalFuelSystem::FuelTank* valveLocation;
         int state = 0; // 0=Closed, 1=Opened
         int commandedState = 0;
-        int isPowered;
+        bool isPowered;
         double gravFeedRate = 0;  //if 0, valve cannot gravFeed
 
     public:
-        explicit FuelTankValve(FuelSystem::FuelTank* location);
-        FuelTankValve(FuelSystem::FuelTank* location, double feedRate);
+        explicit FuelTankValve(PhysicalFuelSystem::FuelTank* location);
+        FuelTankValve(PhysicalFuelSystem::FuelTank* location, double feedRate);
 
         void setState(int nState);
         int getState() const;
