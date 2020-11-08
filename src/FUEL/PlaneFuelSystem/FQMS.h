@@ -45,9 +45,6 @@ namespace PlaneFuelSystem {
         bool* commandedTransfers;
         bool* lastTransfers;
 
-        bool* ECAMProceduresNow;
-        bool* ECAMProceduresPrevious;
-
         bool inFlight;
         int FOB;
         double CGTarget;
@@ -60,8 +57,6 @@ namespace PlaneFuelSystem {
         double time30min;
         double timeAbvFL255;
         double timeBlwFL245;
-
-        int* gravVlvsAux;
 
         void arraysInit();
 
@@ -78,33 +73,13 @@ namespace PlaneFuelSystem {
         void applyPumpState();
         void applyValveState();
 
-        void reportECAMProc();
-        void processPmpFailuresECAM(int id);
+        void updateFrontend();
 
     public:
         FQMS(PhysicalFuelSystem::FuelSystem *fS, FQDC *f, FuelSystem::FuelSystemFrontend* sFE);
 
         void updateLoop(int remMinutes, int GW, double currCG, float simulatorTime, int FL);
 
-
-
-        int getPumpStateECAM(int id);
-
-        int getCrossfeedVlvsStateECAM(int id);
-
-        int getEngLPStateECAM(int id);
-
-        int getAPUFeedStateECAM();
-
-        int getTrimVlvStateECAM();
-
-        int getTransferVlvsStateECAM(int id);
-
-        int getGravVlvsStateECAM(int id);
-
-        int getEmergVlvStateECAM(int id);
-
-        void processCumulativeECAMProc();
     };
 }
 

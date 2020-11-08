@@ -5,7 +5,7 @@
 #include "FQMS.h"
 
 namespace PlaneFuelSystem {
-
+/*
     void FQMS::processPmpFailuresECAM(int id) {
         switch (id) {
             case 0: { //feed 1 main
@@ -142,6 +142,6 @@ namespace PlaneFuelSystem {
             this->ECAMProceduresNow[68] = true;
         }
 
-    }
+    }*/
 }
 

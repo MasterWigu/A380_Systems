@@ -33,6 +33,7 @@ namespace PluginControl {
         PlaneSystemsFrontends* planeFEnds = new PlaneSystemsFrontends();
         planeFEnds->cockpitControls = cC;
         planeFEnds->fuelSystemFe = fS->getFuelFrontend();
+        planeFEnds->ecamFe = eS->getEcamFrontend();
 
 
         //Inform systems of the frontends

@@ -44,8 +44,8 @@ namespace PlaneFuelSystem {
             this->commandedPumpStates[i] = false;
 
         //commVlvStates: 0-Closed, 1-Open, 2-GravOpen, 3-Manual Open, 4-Manual Grav Open
-        this->commandedVlvStates = (int* ) malloc(39 * sizeof(int));
-        for (int i = 0; i < 39; i++)
+        this->commandedVlvStates = (int* ) malloc(47 * sizeof(int));
+        for (int i = 0; i < 47; i++)
             this->commandedVlvStates[i] = 0;
 
         this->pumpsFailStates = (int*) malloc(21*sizeof(int));
@@ -79,20 +79,6 @@ namespace PlaneFuelSystem {
         this->requestedLPValves = (bool*) malloc(5 * sizeof(bool));
         for (int i = 0; i < 5; i++)
             this->requestedLPValves[i] = false;
-
-        this->ECAMProceduresNow = (bool*) malloc(104 * sizeof(bool));
-        for (int i = 0; i < 104; i++)
-            this->ECAMProceduresNow[i] = false;
-
-        this->ECAMProceduresPrevious = (bool*) malloc(104 * sizeof(bool));
-        for (int i = 0; i < 104; i++)
-            this->ECAMProceduresPrevious[i] = false;
-
-
-        this->gravVlvsAux = (int*) malloc(10*sizeof(int));
-        this->gravVlvsAux[0] = 0; this->gravVlvsAux[1] = 1; this->gravVlvsAux[2] = 2; this->gravVlvsAux[3] = 3;
-        this->gravVlvsAux[4] = 16; this->gravVlvsAux[5] = 17; this->gravVlvsAux[6] = 18; this->gravVlvsAux[7] = 19;
-        this->gravVlvsAux[8] = 20; this->gravVlvsAux[9] = 21;
     }
 
     void FQMS::detectAbnCases() {
@@ -226,7 +212,7 @@ namespace PlaneFuelSystem {
         this->applyTransfers();
 
         this->applyState();
-        this->reportECAMProc();
+        this->updateFrontend();
 
     }
 
@@ -537,157 +523,13 @@ namespace PlaneFuelSystem {
         }
     }
 
-    int FQMS::getPumpStateECAM(int id) {
-        if (this->pumpsFailStates[id] == 0 && this->pumpsCockpitButtons[id]) {
-            if(this->commandedPumpStates)
-                return 1; //pump running
-            return 0; //pump off
-        }
-        return 3;
-        //4 (abnOn) and 5 (LO)  are not implemented
-    }
-
-    //failVlvArray: {0 = normal; 1 = Failed open; 2 = Failed closed
-    //valves IDs: 0-4 - Consumers (0-3 Eng, 4 APU)
-    //            5-24 - Wing tks (left->right) Fwd/Aft In
-    //            25    - Trim tk In
-    //            26-35 - Wing tks (left->right) Fwd/Aft Out
-    //            34-35 - Trim tk out
-    //            36-37 - Jettison
-
-    int FQMS::getEngLPStateECAM(int id) {
-        //id = [0, 3]
-        if (this->vlvsFailStates[id+40] == 1 && !this->requestedLPValves[id]) {
-            return 1; //Abn Open
-        }
-        if (this->vlvsFailStates[id+40] == 2 || (this->vlvsFailStates[id+40] == 0 && !this->requestedLPValves[id])) {
-            return 2; //Norm/Abn Closed
-        }
-        return 0; //Open
-    }
-
-    int FQMS::getAPUFeedStateECAM() {
-        if ((this->vlvsFailStates[44] == 0 || this->vlvsFailStates[44] == 2) && !this->requestedLPValves[4]) {
-            return 0; //Normal not fed
-        }
-        if (this->vlvsFailStates[44] == 1 && !this->requestedLPValves[4]) {
-            return 2; //Abn Fed
-        }
-        if (this->vlvsFailStates[44] == 2 && this->requestedLPValves[4]) {
-            return 3; //Abn Closed
-        }
-        return 1; //Normal Fed
-    }
-
-    int FQMS::getCrossfeedVlvsStateECAM(int id) {
-        //id = [0, 3]
-        if ((this->vlvsFailStates[id+30] == 2 || this->vlvsFailStates[id+30] == 0) && this->commandedVlvStates[id+30] == 0) {
-            return 0; //Valve closed
-        }
-        if ((this->vlvsFailStates[id+30] == 1 || this->vlvsFailStates[id+30] == 0) && this->commandedVlvStates[id+30] != 0) {
-            return 1; //Valve open
-        }
-        if (this->vlvsFailStates[id+30] == 2) {
-            return 2; //Valve failed closed
-        }
-        if (this->vlvsFailStates[id+30] == 1) {
-            return 3; //Valve failed open
-        }
-        return 0; //should never get here
-    }
-
-    int FQMS::getTrimVlvStateECAM() {
-        if (((this->vlvsFailStates[37] == 0 || this->vlvsFailStates[37] == 1) && this->commandedVlvStates[37] != 0) ||
-            ((this->vlvsFailStates[38] == 0 || this->vlvsFailStates[38] == 1) && this->commandedVlvStates[38] != 0) ||
-            ((this->vlvsFailStates[20] == 0 || this->vlvsFailStates[20] == 1) && this->commandedVlvStates[20] != 0) ||
-            ((this->vlvsFailStates[21] == 0 || this->vlvsFailStates[21] == 1) && this->commandedVlvStates[21] != 0)) {
-            return 0; //Not isolated
-        }
-        if (((this->vlvsFailStates[37] == 0 || this->vlvsFailStates[37] == 2) && this->commandedVlvStates[37] == 0) &&
-            ((this->vlvsFailStates[38] == 0 || this->vlvsFailStates[38] == 2) && this->commandedVlvStates[38] == 0) &&
-            ((this->vlvsFailStates[20] == 0 || this->vlvsFailStates[20] == 2) && this->commandedVlvStates[20] == 0) &&
-            ((this->vlvsFailStates[21] == 0 || this->vlvsFailStates[21] == 2) && this->commandedVlvStates[21] == 0)) {
-            return 1; //Isolated
-        }
-        if (((this->vlvsFailStates[37] == 1) && this->commandedVlvStates[37] == 0) ||
-            ((this->vlvsFailStates[38] == 1) && this->commandedVlvStates[38] == 0) ||
-            ((this->vlvsFailStates[20] == 1) && this->commandedVlvStates[20] == 0) ||
-            ((this->vlvsFailStates[21] == 1) && this->commandedVlvStates[21] == 0)) {
-            return 2; //Abn not isolated
-        }
-        return 3; //Abn isolated
-    }
-
-    int FQMS::getTransferVlvsStateECAM(int id) {
-        //id = [0, 20]
-        //TODO check if case of valve 20 is working
-        if (id == 20) {
-            if ((this->vlvsFailStates[20] == 0 || this->vlvsFailStates[20] == 2) && (this->commandedVlvStates[20]==0 || this->commandedVlvStates[20]==2 || this->commandedVlvStates[20]==4) &&
-                (this->vlvsFailStates[21] == 0 || this->vlvsFailStates[21] == 2) && (this->commandedVlvStates[21]==0 || this->commandedVlvStates[21]==2 || this->commandedVlvStates[21]==4)) {
-                return 0; //no transfer
-            }
-            if ((this->vlvsFailStates[20] == 0 || this->vlvsFailStates[20] == 1) && this->commandedVlvStates[20]==1 &&
-                (this->vlvsFailStates[21] == 0 || this->vlvsFailStates[21] == 1) && this->commandedVlvStates[21]==1) {
-                return 1; //auto transfer
-            }
-            if ((this->vlvsFailStates[20] == 0 || this->vlvsFailStates[20] == 1) && this->commandedVlvStates[20]==3 ||
-                (this->vlvsFailStates[21] == 0 || this->vlvsFailStates[21] == 1) && this->commandedVlvStates[21]==3) {
-                return 2; //manual transfer
-            }
-            return 3;
-        }
-
-        if ((this->vlvsFailStates[id] == 0 || this->vlvsFailStates[id] == 2) && (this->commandedVlvStates[id]==0 || this->commandedVlvStates[id]==2 || this->commandedVlvStates[id]==4)) {
-            return 0; //no transfer
-        }
-        if ((this->vlvsFailStates[id] == 0 || this->vlvsFailStates[id] == 1) && this->commandedVlvStates[id]==1) {
-            return 1; //auto transfer
-        }
-        if ((this->vlvsFailStates[id] == 0 || this->vlvsFailStates[id] == 1) && this->commandedVlvStates[id]==3) {
-            return 2; //manual transfer
-        }
-        return 3; //Abn transfer (how can this happen boy?)
-    }
-
-    int FQMS::getGravVlvsStateECAM(int id) {
-        int innId = this->gravVlvsAux[id];
-        //id = [0, 9]
-        if ((this->vlvsFailStates[innId] == 0 || this->vlvsFailStates[innId] == 2) && (this->commandedVlvStates[innId]==0 || this->commandedVlvStates[innId]==1 || this->commandedVlvStates[innId]==3)) {
-            return 0; //no transfer
-        }
-        if ((this->vlvsFailStates[innId] == 0 || this->vlvsFailStates[innId] == 1) && this->commandedVlvStates[innId]==2) {
-            return 1; //auto transfer
-        }
-        if ((this->vlvsFailStates[innId] == 0 || this->vlvsFailStates[innId] == 1) && this->commandedVlvStates[innId]==4) {
-            return 2; //manual transfer
-        }
-        //TODO this will fuck up im sure
-        return 3; //Abn transfer
-    }
-
-    int FQMS::getEmergVlvStateECAM(int id) {
-        //id = [0, 1]
-        if ((this->vlvsFailStates[id+28] == 0 || this->vlvsFailStates[id+28] == 2) && this->commandedVlvStates[id+28]==0) {
-            return 0; //norm closed
-        }
-        if ((this->vlvsFailStates[id+28] == 0 || this->vlvsFailStates[id+28] == 1) && (this->commandedVlvStates[id+28]==1 || this->commandedVlvStates[id+28]==3)) {
-            return 1; //norm open
-        }
-        return 2; //abn closed/open
-    }
 
 
-    void FQMS::reportECAMProc() {
-        for (int i=0; i<103; i++) {
-            if (this->ECAMProceduresNow[i] == this->ECAMProceduresPrevious[i]) {
-                continue;
-            }
-            else if (this->ECAMProceduresNow[i]) {
-                //report true
-            }
-            else {
-                //report false
-            }
-        }
+    void FQMS::updateFrontend() {
+        this->frontend->setTankLevels(this->tankLevels);
+        this->frontend->setValvesCommStates(this->commandedVlvStates);
+        this->frontend->setValvesFailStates(this->vlvsFailStates);
+        this->frontend->setPmpsCommStates(this->commandedPumpStates);
+        this->frontend->setPmpsFailStates(this->pumpsFailStates);
     }
 }
