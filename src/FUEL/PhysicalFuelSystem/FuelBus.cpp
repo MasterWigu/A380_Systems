@@ -9,7 +9,7 @@
 
 PhysicalFuelSystem::FuelBus::FuelBus(int bNum, PhysicalFuelSystem::FuelPump **pumps, int nPumps, PhysicalFuelSystem::FuelTankValve **tankValves, int nTValves, PhysicalFuelSystem::FuelConsumer** consumers, int nCons) {
     this->busNum = bNum;
-    this->efectiveBusNum = 0;
+    this->effectiveBusNum = 0;
 
     this->pumpsList = (FuelPump**) malloc(nPumps * sizeof(FuelPump*));
     for (int i=0; i<nPumps; i++) {
@@ -129,11 +129,11 @@ int PhysicalFuelSystem::FuelBus::getBusNum() {
 }
 
 void PhysicalFuelSystem::FuelBus::setEfBusNum(int bNum) {
-    this->efectiveBusNum = bNum;
+    this->effectiveBusNum = bNum;
 }
 
 int PhysicalFuelSystem::FuelBus::getEfBusNum() {
-    return this->efectiveBusNum;
+    return this->effectiveBusNum;
 }
 
 void PhysicalFuelSystem::FuelBus::setBusValves(PhysicalFuelSystem::FuelBusValve **bValves, int nBValves) {
