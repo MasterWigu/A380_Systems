@@ -1,5 +1,5 @@
 //
-// Created by morei on 31/08/2020.
+// Created by MasterWigu on 31/08/2020.
 //
 
 #ifndef A380_SYSTEMS_EMERGTRANSVALVE_H
@@ -44,7 +44,7 @@ namespace PhysicalFuelSystem {
         void transfer();
 
         /// Sets the power to the valve making it work or not
-        /// @param p boolean representing the power (true=present; false=absent)
+        /// @param [in] p boolean representing the power (true=present; false=absent)
         void setPower(bool p);
 
 

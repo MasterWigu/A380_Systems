@@ -1,5 +1,5 @@
 //
-// Created by morei on 23/09/2020.
+// Created by MasterWigu on 23/09/2020.
 //
 
 #ifndef A380_SYSTEMS_ECAMCALLBACKS_H

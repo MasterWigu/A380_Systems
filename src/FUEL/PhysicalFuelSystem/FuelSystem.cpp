@@ -1,5 +1,5 @@
 //
-// Created by morei on 28/08/2020.
+// Created by MasterWigu on 28/08/2020.
 //
 
 #include "FuelSystem.h"
@@ -293,6 +293,8 @@ namespace PhysicalFuelSystem {
     }
 
     void FuelSystem::update(float simulatorTime) {
+
+        //calculate time since last update
         if (this->lastSimTime == -1)
             this->lastSimTime = simulatorTime;
         else
@@ -306,7 +308,7 @@ namespace PhysicalFuelSystem {
             this->fuelBuses[i]->setEfBusNum(i);
         }
 
-
+        //see fuel readme for explanation of the general algorithm
         //2nd, calculate effective buses
         for (int i = 0; i < 8; i++) { //go through all buses
             FuelBus* currBus = this->fuelBuses[i];
@@ -321,8 +323,8 @@ namespace PhysicalFuelSystem {
                         otherBus = tempValve->getLocation2();               // get the other bus
                     }
 
-                    if (otherBus->getEfBusNum() > currBus->getEfBusNum())
-                        otherBus->setEfBusNum(currBus->getEfBusNum());
+                    if (otherBus->getEfBusNum() > currBus->getEfBusNum()) //
+                        otherBus->setEfBusNum(currBus->getEfBusNum());    // if the other has bigger index, put our index
                 }
             }
         }
@@ -366,6 +368,7 @@ namespace PhysicalFuelSystem {
             }
         }
 
+        //check if all engines were fulfilled
         for (int i=0; i<5; i++) {
             this->enginesFulfilled[i] = this->consumers[i]->isFulfilled();
         }
@@ -490,7 +493,6 @@ namespace PhysicalFuelSystem {
     }
 
     double FuelSystem::readQuantity(int id) {
-        //TODO see if double makes difference upstream
         if (id == 11)
             return this->tanks[1]->getCollectorFuel();
         if (id == 12)

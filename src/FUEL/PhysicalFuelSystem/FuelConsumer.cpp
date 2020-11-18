@@ -1,19 +1,10 @@
 //
-// Created by morei on 29/08/2020.
+// Created by MasterWigu on 29/08/2020.
 //
 
 #include "FuelConsumer.h"
 
 namespace PhysicalFuelSystem {
-
-    FuelConsumer::FuelConsumer(double r) {
-        this->state = 0; // Starts closed
-        this->commandedState = 0;
-        this->rate = r;
-        this->lastSupply = 0;
-        this->isJettison = false;
-        this->isPowered = false;
-    }
 
     FuelConsumer::FuelConsumer(double r, bool jet) {
         this->state = 0; // Starts closed

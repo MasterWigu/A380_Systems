@@ -1,5 +1,5 @@
 //
-// Created by morei on 28/08/2020.
+// Created by MasterWigu on 28/08/2020.
 //
 
 #include "FuelTank.h"
@@ -21,12 +21,12 @@ namespace PhysicalFuelSystem {
     }
 
     double FuelTank::getFuel() const {
-        return this->currFuelKg - this->collectorCapacity;
+        return this->currFuelKg - this->collectorCapacity; //the fuel in the tank doesn't include collector
     }
 
     double FuelTank::getCollectorFuel() const {
         if (this->currFuelKg > this->collectorCapacity)
-            return this->collectorCapacity;
+            return this->collectorCapacity; //if the tank has fuel, we assume the collector is full
         return this->currFuelKg;
     }
 

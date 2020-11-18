@@ -1,5 +1,5 @@
 //
-// Created by morei on 28/08/2020.
+// Created by MasterWigu on 28/08/2020.
 //
 
 #include "FuelPump.h"
@@ -30,8 +30,7 @@ namespace PhysicalFuelSystem {
     }
 
     void FuelPump::pumpFuel(double amount) {
-        // TODO check for addRemFuel not returning 0 (tank did not have enough fuel) (should not happen) (maybe it can, idk/c)
-        if (this->isFeed)
+        if (this->isFeed) //if it is a feed pump, it gets fuel from the collector
             this->pumpLocation->removeFuelCollector(amount);
         else
             this->pumpLocation->removeFuel(amount);
@@ -47,7 +46,7 @@ namespace PhysicalFuelSystem {
 
     void FuelPump::setState(int s) {
         this->commandedState = s;
-        if (this->isFailed || !this->hasPower)
+        if (this->isFailed || !this->hasPower) //only change state if it is not failed
             this->state = 0;
         else
             this->state = s;

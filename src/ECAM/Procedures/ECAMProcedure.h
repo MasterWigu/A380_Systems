@@ -1,5 +1,5 @@
 //
-// Created by morei on 10/10/2020.
+// Created by MasterWigu on 10/10/2020.
 //
 
 #ifndef A380_SYSTEMS_ECAMPROCEDURE_H

@@ -1,5 +1,5 @@
 //
-// Created by morei on 28/08/2020.
+// Created by MasterWigu on 28/08/2020.
 //
 
 #ifndef UNTITLED_FUELBUS_H
@@ -84,15 +84,16 @@ namespace PhysicalFuelSystem {
         /// @return the amount of fuel it could *not* pump from the asked amount
         double pump(double amount);
 
-        /// Gets the maximum gravity fed amount of fuel for the time period specified (usually the time since last update)
-        /// @param [in] deltaTime - time since last update in seconds
-        /// @return the amount of fuel
-        double getMaxAvailGravity(float deltaTime);
-
         /// Gets the maximum pumped amount of fuel for the time period specified (usually the time since last update)
         /// @param [in] deltaTime - time since last update in seconds
         /// @return the amount of fuel
         double getMaxAvailPumped(float deltaTime);
+
+        /// Gets the maximum gravity fed amount of fuel for the time period specified (usually the time since last update)
+        /// This function can only be called after getMaxAvailPumped and only if that returned 0!!!!
+        /// @param [in] deltaTime - time since last update in seconds
+        /// @return the amount of fuel
+        double getMaxAvailGravity(float deltaTime);
     };
 }
 

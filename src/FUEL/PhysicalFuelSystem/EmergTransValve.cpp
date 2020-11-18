@@ -1,5 +1,5 @@
 //
-// Created by morei on 31/08/2020.
+// Created by MasterWigu on 31/08/2020.
 //
 
 #include "EmergTransValve.h"
@@ -15,7 +15,7 @@ PhysicalFuelSystem::EmergTansValve::EmergTansValve(PhysicalFuelSystem::FuelTank 
 
 void PhysicalFuelSystem::EmergTansValve::setState(int nState) {
     this->commandedState = nState;
-    if (this->isPowered)
+    if (this->isPowered)  //we only change state if we have power
         this->state = nState;
 }
 
@@ -25,16 +25,16 @@ int PhysicalFuelSystem::EmergTansValve::getState() {
 
 void PhysicalFuelSystem::EmergTansValve::transfer() {
     if (state == 1) { //only if valve is open
-        double valueToTransfer = this->upper->getFuel();
-        if (valueToTransfer > this->rate) valueToTransfer = this->rate;
-        double remainder = this->lower->addFuel(valueToTransfer);
-        this->upper->removeFuel(valueToTransfer - remainder);
+        double valueToTransfer = this->upper->getFuel();  //max fuel to transfer = upper tank total quantity
+        if (valueToTransfer > this->rate) valueToTransfer = this->rate; // limit it by the rate
+        double remainder = this->lower->addFuel(valueToTransfer); // limit it to the space in the lower tank
+        this->upper->removeFuel(valueToTransfer - remainder); // remove the quantity after all limitations
     }
 }
 
 void PhysicalFuelSystem::EmergTansValve::setPower(bool p) {
     this->isPowered = p;
-    if (p)
+    if (p) //when power is restored, set the last commanded state
         this->state = this->commandedState;
 }
 

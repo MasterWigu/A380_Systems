@@ -1,11 +1,13 @@
 //
-// Created by morei on 31/08/2020.
+// Created by MasterWigu on 31/08/2020.
 //
 
 #ifndef A380_SYSTEMS_DISTRIBUTIONTABLES_H
 #define A380_SYSTEMS_DISTRIBUTIONTABLES_H
 
 namespace PlaneFuelSystem {
+
+    /// This class calculates the fuel in the trim tank by using the tables from the WBM
     class DistributionTables {
     private:
         int*** trimFuel;

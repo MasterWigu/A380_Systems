@@ -1,5 +1,5 @@
 //
-// Created by morei on 28/08/2020.
+// Created by MasterWigu on 28/08/2020.
 //
 #include <cmath>
 #include "FuelBus.h"
@@ -44,6 +44,7 @@ double PhysicalFuelSystem::FuelBus::getMaxAvailPumped(float deltaTime) {
     double availKg = 0.0;
 
     for (int i = 0; i<this->numPumps; i++) {
+        // we temp store the pumped amounts by pump so that we can speed up the distribution
         this->pumpAmounts[i] = this->pumpsList[i]->getPumpable(deltaTime);
         availKg += this->pumpAmounts[i];
     }
@@ -54,15 +55,14 @@ double PhysicalFuelSystem::FuelBus::getMaxAvailPumped(float deltaTime) {
     this->totalPumpGravFuel = availKg;
     return availKg;
 
-    // TODO case in which the two main buses are connected (fuel made avail twice in mid and inner tanks)
-
 }
 
 double PhysicalFuelSystem::FuelBus::getMaxAvailGravity(float deltaTime) {
     // This function can only be called after getMaxAvailPumped and only if that returned 0!!!!
-    double availKg = 0;
+    double availKg = 0.0;
 
-    for (int i = 0; i<this->numTankValves; i++) {
+    for (int i = 0; i<this->numTankValves; i++) { //checks all valves in the bus for gravity fed fuel
+        // we store the feed amounts by valve so that we can speed up the distribution
         this->gravFeedAmounts[i] = this->tankValvesList[i]->getGravFeedable(deltaTime);
         availKg += this->gravFeedAmounts[i];
     }
@@ -72,17 +72,17 @@ double PhysicalFuelSystem::FuelBus::getMaxAvailGravity(float deltaTime) {
 }
 
 double PhysicalFuelSystem::FuelBus::distribute(double amount, float deltaTime) {
-    //consumers have priority always
+    //consumers have priority always so we firstly distribute by them
     for (int i = 0; i<this->numConsumers; i++) {
         if (this->consumersList[i]->canConsume()) {
             amount = this->consumersList[i]->consume(amount, deltaTime);
         }
     }
-    if (amount <= 0) {
+    if (amount <= 0) { // if we didn't have enough fuel, we return
         return amount;
     }
 
-    int numOpenValves = 0;
+    int numOpenValves = 0; // we count the number of open valves
     for (int i = 0; i<this->numTankValves; i++) {
         if (this->tankValvesList[i]->getState() == 1)
             numOpenValves++;
@@ -108,7 +108,7 @@ double PhysicalFuelSystem::FuelBus::pump(double amount) {
     double percentage = amount / this->totalPumpGravFuel;
 
     double aux = 0;
-    for (int i=0; i<this->numPumps; i++) {
+    for (int i=0; i<this->numPumps; i++) { // we ask each pump to pump the needed fuel
         aux = pumpAmounts[i]*percentage;
         amount -= aux;
         this->pumpsList[i]->pumpFuel(aux);
@@ -116,7 +116,7 @@ double PhysicalFuelSystem::FuelBus::pump(double amount) {
 
     if (amount <= 1) // <1 instead of ==0 to compensate rounding errors
         return 0;
-    for (int i=0; i<this->numTankValves; i++) {
+    for (int i=0; i<this->numTankValves; i++) { // then we get fuel by gravity feeding
         aux = gravFeedAmounts[i]*percentage;
         amount -= aux;
         this->tankValvesList[i]->gravityFeed(aux);

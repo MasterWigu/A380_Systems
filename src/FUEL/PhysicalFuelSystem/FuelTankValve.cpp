@@ -1,5 +1,5 @@
 //
-// Created by morei on 28/08/2020.
+// Created by MasterWigu on 28/08/2020.
 //
 
 #include "FuelTankValve.h"
@@ -34,11 +34,11 @@ namespace PhysicalFuelSystem {
     double FuelTankValve::getGravFeedable(float deltaTime) {
         double maxFeedable = (this->gravFeedRate / 60.0) * deltaTime;
 
-        if (this->state == 1 && maxFeedable != 0) {
-            if (this->valveLocation->getFuel() > maxFeedable) {
+        if (this->state == 1 && maxFeedable != 0) { //valve must be open and support gravity feed
+            if (this->valveLocation->getFuel() > maxFeedable) { //if the tank has enough fuel, return it
                 return maxFeedable;
             }
-            return this->valveLocation->getFuel();
+            return this->valveLocation->getFuel(); // else return what the tank has
         }
         return 0;
     }

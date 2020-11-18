@@ -1,5 +1,5 @@
 //
-// Created by morei on 08/09/2020.
+// Created by MasterWigu on 08/09/2020.
 //
 
 #ifndef A380_SYSTEMS_OUTMID_H

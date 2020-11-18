@@ -1,5 +1,5 @@
 //
-// Created by morei on 31/08/2020.
+// Created by MasterWigu on 31/08/2020.
 //
 
 #include "DistributionTables.h"
