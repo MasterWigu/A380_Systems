@@ -23,10 +23,12 @@ int PhysicalFuelSystem::EmergTansValve::getState() {
     return this->state;
 }
 
-void PhysicalFuelSystem::EmergTansValve::transfer() {
+void PhysicalFuelSystem::EmergTansValve::transfer(float deltaTime) {
+    double maxTransfer = (this->rate / 60.0) * deltaTime;
+
     if (state == 1) { //only if valve is open
         double valueToTransfer = this->upper->getFuel();  //max fuel to transfer = upper tank total quantity
-        if (valueToTransfer > this->rate) valueToTransfer = this->rate; // limit it by the rate
+        if (valueToTransfer > maxTransfer) valueToTransfer = maxTransfer; // limit it by the rate
         double remainder = this->lower->addFuel(valueToTransfer); // limit it to the space in the lower tank
         this->upper->removeFuel(valueToTransfer - remainder); // remove the quantity after all limitations
     }

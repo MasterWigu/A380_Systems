@@ -1,11 +1,13 @@
 //
 // Created by MasterWigu on 06/10/2020.
 //
-
-#include "FQMS.h"
+//****************************************************
+// LEGACY CODE - NOT IN USE
+//****************************************************
+/*#include "FQMS.h"
 
 namespace PlaneFuelSystem {
-/*
+
     void FQMS::processPmpFailuresECAM(int id) {
         switch (id) {
             case 0: { //feed 1 main
@@ -99,7 +101,6 @@ namespace PlaneFuelSystem {
             }
 
 
-                //TODO add cases for transfer pumps
         }
     }
 
@@ -142,6 +143,6 @@ namespace PlaneFuelSystem {
             this->ECAMProceduresNow[68] = true;
         }
 
-    }*/
-}
+    }
+}*/
 

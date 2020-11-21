@@ -40,8 +40,8 @@ namespace PhysicalFuelSystem {
         int getState();
 
         /// Transfers fuel from the upper tank to the lower according to the rate and the elapsed time since the last update cycle
-        //TODO add elapsed time
-        void transfer();
+        /// @param [in] deltaTime - the time since the last update
+        void transfer(float deltaTime);
 
         /// Sets the power to the valve making it work or not
         /// @param [in] p boolean representing the power (true=present; false=absent)

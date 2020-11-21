@@ -50,7 +50,6 @@ namespace PhysicalFuelSystem {
 
 
         this->tankValves = (FuelTankValve**) malloc(22*sizeof(FuelTankValve*));
-        // TODO try to guess gravity feed rates
         this->tankValves[0]  = new FuelTankValve(this->tanks[0], 5000); //0  - Bus0 -> Left Outer
         this->tankValves[1]  = new FuelTankValve(this->tanks[0], 5000); //1  - Bus1 -> Left Outer
         this->tankValves[2]  = new FuelTankValve(this->tanks[1], 0);    //2  - Bus0 -> Left Feed 1
@@ -367,6 +366,10 @@ namespace PhysicalFuelSystem {
                 }
             }
         }
+
+        //if the emergency valves are open, they will transfer fuel
+        this->emergValves[0]->transfer(deltaTime);
+        this->emergValves[1]->transfer(deltaTime);
 
         //check if all engines were fulfilled
         for (int i=0; i<5; i++) {

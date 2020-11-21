@@ -59,7 +59,7 @@ namespace PlaneFuelSystem {
     }
 
     int DistributionTables::calculateTrimFuel(int cPFQ) {
-        return this->calculateTrimFuel(282000, cPFQ, 36.5);
+        return this->calculateTrimFuel(300000, cPFQ, 36.5);
     }
 
     int DistributionTables::calculateTrimFuel(int ZFW, int cPFQ, double ZFCG) {
