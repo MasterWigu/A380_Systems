@@ -1,7 +1,3 @@
-//
-// Created by MasterWigu on 17/10/2020.
-//
-
 #ifndef A380_SYSTEMS_FUELSYSTEMFRONTEND_H
 #define A380_SYSTEMS_FUELSYSTEMFRONTEND_H
 

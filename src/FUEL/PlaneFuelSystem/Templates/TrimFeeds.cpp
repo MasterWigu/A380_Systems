@@ -1,8 +1,3 @@
-//
-// Created by MasterWigu on 07/09/2020.
-//
-
-
 #include <cstdlib>
 #include "TrimFeeds.h"
 

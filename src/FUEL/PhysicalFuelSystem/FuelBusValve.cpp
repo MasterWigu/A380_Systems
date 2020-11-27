@@ -1,7 +1,3 @@
-//
-// Created by MasterWigu on 28/08/2020.
-//
-
 #include "FuelBusValve.h"
 
 namespace PhysicalFuelSystem {

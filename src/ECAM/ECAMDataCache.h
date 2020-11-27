@@ -1,7 +1,3 @@
-//
-// Created by MasterWigu on 07/11/2020.
-//
-
 #ifndef A380_SYSTEMS_ECAMDATACACHE_H
 #define A380_SYSTEMS_ECAMDATACACHE_H
 

@@ -1,7 +1,3 @@
-//
-// Created by MasterWigu on 17/10/2020.
-//
-
 #include "ECAMSystemControl.h"
 
 namespace ECAM {

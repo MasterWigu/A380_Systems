@@ -1,14 +1,10 @@
-//
-// Created by MasterWigu on 11/09/2020.
-//
-
 #ifndef A380_SYSTEMS_PLUGINCONTROL_H
 #define A380_SYSTEMS_PLUGINCONTROL_H
 
 #include <cmath>
-#include "../../include/SDK/CHeaders/XPLM/XPLMDataAccess.h"
-#include "../../include/SDK/CHeaders/XPLM/XPLMPlugin.h"
-#include "../../include/SDK/CHeaders/XPLM/XPLMProcessing.h"
+#include "../../include/XPSDK303/CHeaders/XPLM/XPLMDataAccess.h"
+#include "../../include/XPSDK303/CHeaders/XPLM/XPLMPlugin.h"
+#include "../../include/XPSDK303/CHeaders/XPLM/XPLMProcessing.h"
 
 #include "../FUEL/SystemControl.h"
 

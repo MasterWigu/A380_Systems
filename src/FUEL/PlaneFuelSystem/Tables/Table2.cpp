@@ -1,6 +1,3 @@
-//
-// Created by MasterWigu on 01/09/2020.
-//
 #include "Tables.h"
 
 namespace PlaneFuelSystem {

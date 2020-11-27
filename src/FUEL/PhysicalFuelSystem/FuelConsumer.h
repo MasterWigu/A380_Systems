@@ -1,7 +1,3 @@
-//
-// Created by MasterWigu on 29/08/2020.
-//
-
 #ifndef UNTITLED_FUELCONSUMER_H
 #define UNTITLED_FUELCONSUMER_H
 

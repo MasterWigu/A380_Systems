@@ -1,6 +1,3 @@
-//
-// Created by MasterWigu on 28/08/2020.
-//
 #include <cmath>
 #include "FuelBus.h"
 #include <cstdlib>

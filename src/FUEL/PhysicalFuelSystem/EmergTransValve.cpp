@@ -1,7 +1,3 @@
-//
-// Created by MasterWigu on 31/08/2020.
-//
-
 #include "EmergTransValve.h"
 
 PhysicalFuelSystem::EmergTansValve::EmergTansValve(PhysicalFuelSystem::FuelTank *upper, PhysicalFuelSystem::FuelTank *lower) {

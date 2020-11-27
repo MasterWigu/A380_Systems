@@ -1,7 +1,3 @@
-//
-// Created by MasterWigu on 28/08/2020.
-//
-
 #ifndef FUELTANK_H
 #define FUELTANK_H
 namespace PhysicalFuelSystem {

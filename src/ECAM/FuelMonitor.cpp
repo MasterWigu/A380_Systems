@@ -1,7 +1,3 @@
-//
-// Created by MasterWigu on 07/11/2020.
-//
-
 #include "FuelMonitor.h"
 
 
@@ -147,8 +143,8 @@ namespace ECAM {
                 (this->ecamDataCache->FUELVlvFailSts[21] == 0 || this->ecamDataCache->FUELVlvFailSts[21] == 1) && this->ecamDataCache->FUELVlvCommSts[21]==1) {
                 return 1; //auto transfer
             }
-            if ((this->ecamDataCache->FUELVlvFailSts[20] == 0 || this->ecamDataCache->FUELVlvFailSts[20] == 1) && this->ecamDataCache->FUELVlvCommSts[20]==3 ||
-                (this->ecamDataCache->FUELVlvFailSts[21] == 0 || this->ecamDataCache->FUELVlvFailSts[21] == 1) && this->ecamDataCache->FUELVlvCommSts[21]==3) {
+            if (((this->ecamDataCache->FUELVlvFailSts[20] == 0 || this->ecamDataCache->FUELVlvFailSts[20] == 1) && this->ecamDataCache->FUELVlvCommSts[20]==3) ||
+                ((this->ecamDataCache->FUELVlvFailSts[21] == 0 || this->ecamDataCache->FUELVlvFailSts[21] == 1) && this->ecamDataCache->FUELVlvCommSts[21]==3)) {
                 return 2; //manual transfer
             }
             return 3;

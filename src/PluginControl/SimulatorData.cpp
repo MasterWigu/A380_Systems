@@ -1,7 +1,3 @@
-//
-// Created by MasterWigu on 01/11/2020.
-//
-
 #include "SimulatorData.h"
 
 namespace PluginControl {

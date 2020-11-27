@@ -1,7 +1,3 @@
-//
-// Created by MasterWigu on 07/09/2020.
-//
-
 #ifndef A380_SYSTEMS_INNEROUTER_H
 #define A380_SYSTEMS_INNEROUTER_H
 

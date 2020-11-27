@@ -1,7 +1,3 @@
-//
-// Created by MasterWigu on 08/09/2020.
-//
-
 #include "OutMid.h"
 #include <cstdlib>
 

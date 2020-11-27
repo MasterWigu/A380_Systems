@@ -1,7 +1,3 @@
-//
-// Created by MasterWigu on 03/09/2020.
-//
-
 #include <cstdlib>
 #include "TemplateGetter.h"
 

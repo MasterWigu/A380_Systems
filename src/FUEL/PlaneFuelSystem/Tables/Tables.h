@@ -1,7 +1,3 @@
-//
-// Created by MasterWigu on 01/09/2020.
-//
-
 #ifndef A380_SYSTEMS_TABLES_H
 #define A380_SYSTEMS_TABLES_H
 

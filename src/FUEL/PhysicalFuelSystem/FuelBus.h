@@ -1,7 +1,3 @@
-//
-// Created by MasterWigu on 28/08/2020.
-//
-
 #ifndef UNTITLED_FUELBUS_H
 #define UNTITLED_FUELBUS_H
 #include "FuelPump.h"

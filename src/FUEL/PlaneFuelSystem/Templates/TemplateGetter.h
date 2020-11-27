@@ -1,7 +1,3 @@
-//
-// Created by MasterWigu on 03/09/2020.
-//
-
 #ifndef A380_SYSTEMS_TEMPLATEGETTER_H
 #define A380_SYSTEMS_TEMPLATEGETTER_H
 

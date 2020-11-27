@@ -1,7 +1,3 @@
-//
-// Created by MasterWigu on 28/08/2020.
-//
-
 #ifndef UNTITLED_FUELBUSVALVE_H
 #define UNTITLED_FUELBUSVALVE_H
 

@@ -1,7 +1,3 @@
-//
-// Created by MasterWigu on 05/09/2020.
-//
-
 #include <cstdlib>
 #include "InnerFeed23.h"
 

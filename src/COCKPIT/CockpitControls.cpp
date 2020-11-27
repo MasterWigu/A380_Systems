@@ -1,7 +1,3 @@
-//
-// Created by MasterWigu on 18/10/2020.
-//
-
 #include <cstdlib>
 #include "CockpitControls.h"
 

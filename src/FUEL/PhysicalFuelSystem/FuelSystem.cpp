@@ -1,13 +1,8 @@
-//
-// Created by MasterWigu on 28/08/2020.
-//
-
 #include "FuelSystem.h"
 #include <iostream>
 
 namespace PhysicalFuelSystem {
     FuelSystem::FuelSystem() {
-        //TODO express rates in kg/min
         this->tanks = (FuelTank**) malloc(11 * sizeof(FuelTank*));
 
         this->tanks[0]  = new FuelTank(8117);               //0  - left outer

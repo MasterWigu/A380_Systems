@@ -1,7 +1,3 @@
-//
-// Created by MasterWigu on 28/08/2020.
-//
-
 #ifndef UNTITLED_FUELTANKVALVE_H
 #define UNTITLED_FUELTANKVALVE_H
 #include "FuelTank.h"

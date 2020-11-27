@@ -1,7 +1,3 @@
-//
-// Created by MasterWigu on 01/09/2020.
-//
-
 #include "FQDC.h"
 
 namespace PlaneFuelSystem {

@@ -137,7 +137,7 @@ extern "C" {
  * disable or enable a plug-in, or discover what plug-in is 'running' at the
  * time.  A plug-in ID is unique within the currently running instance of
  * X-Plane unless plug-ins are reloaded.  Plug-ins may receive a different
- * unique ID each time they are loaded. This include the unloading and
+ * unique ID each time they are loaded. This includes the unloading and
  * reloading of plugins that are part of the user's aircraft.
  * 
  * For persistent identification of plug-ins, use XPLMFindPluginBySignature in

@@ -1,7 +1,3 @@
-//
-// Created by MasterWigu on 31/08/2020.
-//
-
 #ifndef A380_SYSTEMS_EMERGTRANSVALVE_H
 #define A380_SYSTEMS_EMERGTRANSVALVE_H
 

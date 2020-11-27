@@ -1,6 +1,3 @@
-//
-// Created by MasterWigu on 01/09/2020.
-//
 #include "FQMS.h"
 
 namespace PlaneFuelSystem {
@@ -137,12 +134,12 @@ namespace PlaneFuelSystem {
         }
 
         //check conflicting cases (if we have any, declare general fault (pseudo case 7)
-        if (tempCases[0] && tempCases[1] || //all on fwd && all on aft
-            tempCases[0] && tempCases[2] || //all on fwd && to out on aft
-            tempCases[0] && tempCases[3] || //all on fwd && swap for inn
-            tempCases[0] && tempCases[4] || //all on fwd && swap for mid
-            tempCases[0] && tempCases[5] || //all on fwd && grav trans from out (needs both galleries)
-            tempCases[1] && tempCases[5] ) {//all on aft && grav trans from out (needs both galleries)
+        if ((tempCases[0] && tempCases[1]) || //all on fwd && all on aft
+            (tempCases[0] && tempCases[2]) || //all on fwd && to out on aft
+            (tempCases[0] && tempCases[3]) || //all on fwd && swap for inn
+            (tempCases[0] && tempCases[4]) || //all on fwd && swap for mid
+            (tempCases[0] && tempCases[5]) || //all on fwd && grav trans from out (needs both galleries)
+            (tempCases[1] && tempCases[5]) ) {//all on aft && grav trans from out (needs both galleries)
 
             tempCases[7] = true;
         }
@@ -182,13 +179,13 @@ namespace PlaneFuelSystem {
     void FQMS::updateLoop(int remMinutes, int GW, double currCG, float simulatorTime, int f) {
         this->FL = f;
 
-        if (this->lastSimTime == -1)
+        if (this->lastSimTime < 0)
             this->lastSimTime = simulatorTime;
         else
             this->lastSimTime = this->simTime;
         this->simTime = simulatorTime;
 
-        if (f > 2) //TODO temporary, assume inFlight = above 2000ft
+        if (f > 2) //temporary, assume inFlight = above 2000ft
             this->inFlight = true;
         else
             this->inFlight = false;
@@ -304,8 +301,8 @@ namespace PlaneFuelSystem {
         }
         if (!mainFoundTank && this->tankLevels[2]+ this->tankLevels[7] > 200) {
             mainFoundTank = true;
-            if ((this->tankLevels[1] < 19560 || this->tankLevels[8] < 19560 || this->tankLevels[4] < 19560 || this->tankLevels[5] < 19560) &&
-                (!this->lastTransfers[6] && this->tankLevels[1] < 20560 && this->tankLevels[8] < 20560 && this->tankLevels[4] < 20560 && this->tankLevels[5] < 20560) ||  // to start
+            if (((this->tankLevels[1] < 19560 || this->tankLevels[8] < 19560 || this->tankLevels[4] < 19560 || this->tankLevels[5] < 19560) &&
+                (!this->lastTransfers[6] && this->tankLevels[1] < 20560 && this->tankLevels[8] < 20560 && this->tankLevels[4] < 20560 && this->tankLevels[5] < 20560)) ||  // to start
                 (this->lastTransfers[6] && (this->tankLevels[1] < 20560 || this->tankLevels[8] < 20560 ||  this->tankLevels[4] < 20560 || this->tankLevels[5] < 20560))) { //to continue
                 this->commandedTransfers[6] = true;
                 this->fwdOccupied = true;
@@ -345,8 +342,8 @@ namespace PlaneFuelSystem {
         }
 
         //From trim Tank
-        if (this->time80min > 150 && (this->flWasAbove255 && this->timeBlwFL245 > 60) &&  !aftOccupied  && this->tankLevels[10] > 100 || //Start
-            this->lastTransfers[10] && this->tankLevels[10] > 100) { //continue (not all stop conditions are verified
+        if ((this->time80min > 150 && (this->flWasAbove255 && this->timeBlwFL245 > 60) &&  !aftOccupied  && this->tankLevels[10] > 100) || //Start
+            (this->lastTransfers[10] && this->tankLevels[10] > 100)) { //continue (not all stop conditions are verified
             if (this->tankLevels[1]+this->tankLevels[4]+this->tankLevels[5]+this->tankLevels[8] < 89400) { //if feeds not full
                 this->commandedTransfers[10] = true;
                 aftOccupied = true;
@@ -378,7 +375,7 @@ namespace PlaneFuelSystem {
         }
 
         //CG TRANSFERS from trim
-        if (!aftOccupied && currCG > this->CGTarget || ((this->lastTransfers[8] || this->lastTransfers[9] || this->lastTransfers[10]) && currCG > CGTarget - 1)) {
+        if ((!aftOccupied && currCG > this->CGTarget) || ((this->lastTransfers[8] || this->lastTransfers[9] || this->lastTransfers[10]) && currCG > CGTarget - 1)) {
             if (this->tankLevels[3]+ this->tankLevels[6] > 250) { //if inners not empty
                 if (this->tankLevels[3]+ this->tankLevels[6] < 72400) {
                     this->commandedTransfers[8] = true;

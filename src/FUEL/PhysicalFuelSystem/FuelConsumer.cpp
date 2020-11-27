@@ -1,7 +1,3 @@
-//
-// Created by MasterWigu on 29/08/2020.
-//
-
 #include "FuelConsumer.h"
 
 namespace PhysicalFuelSystem {

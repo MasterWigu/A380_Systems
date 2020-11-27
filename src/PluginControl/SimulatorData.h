@@ -1,7 +1,3 @@
-//
-// Created by MasterWigu on 01/11/2020.
-//
-
 #ifndef A380_SYSTEMS_SIMULATORDATA_H
 #define A380_SYSTEMS_SIMULATORDATA_H
 
