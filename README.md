@@ -1,4 +1,4 @@
-#J-Pro's A380 Systems
+# J-Pro's A380 Systems
 
 This repository is the home for all the C and C++ code that simulates in depth all the J-Pro's A380. 
 
@@ -8,7 +8,7 @@ It is assumed that if you are to contribute to this repository, you have some ex
 
 The goal of this project is to create an as accurate as possible A380, so, all the code behind this plane is to be done according to the available documentation and information, which you can find in our [Drive](https://google.com)
 
-##Contributing
+## Contributing
 
 This A380 is an open source project. So, everyone can and is welcome to contribute, being it by writing new code for new features, improving existing code, writing documentation, or even by just be creating or commenting issues with some information that may be useful!
 
@@ -17,7 +17,7 @@ If you want to contribute, you can search for open issues that are not assigned 
 More detailed instructions can be found in [Contributing rules](./contrib.md).
 
 
-##Architecture
+## Architecture
 The A380's systems are organized in a modular way, where each module represents one system. There is a module that is responsible for orchestrating the whole plugin and making sure every system has a way to read data from other systems.
 
 The diagram bellow illustrates this organization.
@@ -41,9 +41,9 @@ The main effort to increase performance is to ensure all classes' initialization
 IMPORTANT: Make sure any new files you create, remove or change the name are correctly inserted or removed from the CMakeLists.txt file!
 
 
-##Build
+## Build
 There are several ways to compile the code in this repository, depending on your OS and the target OS for the build.
-###All systems (universal)
+### All systems (universal)
 This method works in all OSs and builds the plugin for all three OSs (win, mac, lin). This method uses a linux docker image and some scripts to avoid installing several compilers and tools in you system.
 To use this method you only have to have installed [Docker](https://docs.docker.com/install/) and GNU Make (there is a version for windows too!).
 
@@ -80,11 +80,11 @@ For now these are the only supported and tested methods. You can always add new 
 
 
 
-##Licence
+## Licence
 All the code and text in this repository is licensed under the GNU General Public License version 3.
 
 
-##Acknowledgements 
+## Acknowledgements 
 We thank all contributors to this project for all the contributions!
 
 The credit for the build system using docker goes for https://github.com/sparker256.
