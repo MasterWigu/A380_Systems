@@ -1,6 +1,6 @@
 # A380 Systems build script.
 #
-# Thanks to https://github.com/sparker25 for the whole build system!
+# Thanks to https://github.com/sparker256 for the whole build system!
 #
 # Useful command line flags:
 #   * -DCMAKE_BUILD_TYPE=XXX, where XXX is one of Debug, Release,
@@ -68,11 +68,12 @@ list(APPEND A380SYS_SRCS main.cpp
         ECAM/ECAMSystemControl.cpp ECAM/ECAMSystemControl.h ECAM/FuelMonitor.cpp ECAM/FuelMonitor.h ECAM/ECAMFrontend.cpp ECAM/ECAMFrontend.h ECAM/ECAMDataCache.cpp ECAM/ECAMDataCache.h
 
         PluginControl/PlaneSystemsFrontends.h PluginControl/SimulatorData.cpp PluginControl/SimulatorData.h PluginControl/PlaneSystemsRefs.h PluginControl/SystemsControl.cpp PluginControl/SystemsControl.h  PluginControl/PluginControl.cpp PluginControl/PluginControl.h
+        PluginControl/DatarefHandlers/XPLANE_DataHandlers.cpp PluginControl/DatarefHandlers/XPLANE_DataHandlers.h PluginControl/DatarefHandlers/COCKPIT_DataHandlers.cpp PluginControl/DatarefHandlers/COCKPIT_DataHandlers.h PluginControl/DatarefHandlers/ECAM_DataHandlers.cpp PluginControl/DatarefHandlers/ECAM_DataHandlers.h PluginControl/DatarefHandlers/FUEL_DataHandlers.cpp PluginControl/DatarefHandlers/FUEL_DataHandlers.h
 
         COCKPIT/CockpitControls.cpp COCKPIT/CockpitControls.h)
 
 
-add_library(A380Systems SHARED ${A380SYS_SRCS})
+add_library(A380Systems SHARED ${A380SYS_SRCS} )
 
 target_compile_features(A380Systems PUBLIC cxx_std_11)
 

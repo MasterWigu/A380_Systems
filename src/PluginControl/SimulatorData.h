@@ -2,6 +2,9 @@
 #define A380_SYSTEMS_SIMULATORDATA_H
 
 namespace PluginControl {
+
+    /// @class SimulatorData is to be used as a cache for all data that we need to read from the simulator.
+    /// This is equivalent to the system's frontends, but for data coming from the simulator.
     class SimulatorData {
     private:
         float simulatorTime;

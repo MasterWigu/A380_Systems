@@ -4,13 +4,18 @@
 
 namespace PluginControl {
 
-    SystemsControl::SystemsControl(SimulatorData* sD) {
-        this->simulatorData = sD;
+    SystemsControl::SystemsControl() {
+        this->simulatorData = nullptr;
         this->systemsInstantiated = false;
         this->planeSystems = nullptr;
     }
 
     void SystemsControl::createSystems() {
+        //Initialize part of the PluginControl System
+        this->simulatorData = new SimulatorData();
+
+
+
         //Create all systems
 
         Cockpit::CockpitControls* cC = new Cockpit::CockpitControls();
@@ -27,6 +32,7 @@ namespace PluginControl {
 
         //Create systems frontends
         PlaneSystemsFrontends* planeFEnds = new PlaneSystemsFrontends();
+        planeFEnds->simulatorData = this->simulatorData;
         planeFEnds->cockpitControls = cC;
         planeFEnds->fuelSystemFe = fS->getFuelFrontend();
         planeFEnds->ecamFe = eS->getEcamFrontend();
@@ -36,13 +42,27 @@ namespace PluginControl {
         fS->setPlaneFrontends(planeFEnds);
         eS->setPlaneFrontends(planeFEnds);
 
+        //Create data handlers and inform them of where are the systems
+        this->cockpitDataHandlers = new COCKPIT_DataHandlers(cC);
+        this->ecamDataHandlers = new ECAM_DataHandlers(eS->getEcamFrontend());
+        this->fuelDataHandlers = new FUEL_DataHandlers(fS->getFuelFrontend());
+        this->xplaneDataHandlers = new XPLANE_DataHandlers(this->simulatorData);
+
+
         this->planeSystems = planeRefs;
         this->systemsInstantiated = true;
     }
 
+    void SystemsControl::enablePlugin() {
+
+    }
+
     void SystemsControl::updateAllSystems() {
+        this->xplaneDataHandlers->readAll(); //update the simulator data cache
 
         this->planeSystems->fuelSystem->update(100, simulatorData->getPlaneGw(), simulatorData->getPlaneCurrCg(), simulatorData->getSimulatorTime(), simulatorData->getFl());
         this->planeSystems->ecamSystem->update();
+
     }
+
 }

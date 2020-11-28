@@ -33,6 +33,8 @@ All systems have three main components:
 
 Each system can have a readme and extra files documenting specific aspects of itself.
 
+There is also a Documents folder that has extra information about systems or coding details!
+
 ## Code style
 All the code is mainly C code just with the addition of C++ classes. This was done to keep tighter control of memory allocation (using mallocs) to try to improve performance. (It was also done because the head developer is more familiar with C than C++ )
 

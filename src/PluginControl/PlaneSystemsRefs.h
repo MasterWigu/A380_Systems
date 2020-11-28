@@ -6,6 +6,10 @@
 #include "../ECAM/ECAMSystemControl.h"
 
 namespace PluginControl {
+
+    /// @class PlaneSystemsRefs is the class that aggregates the references for all system's control endpoints.
+    /// This is used only by the PluginControl module to keep control of all plane's systems.
+    /// (this class is a singleton)
     class PlaneSystemsRefs {
     public:
         FuelSystem::SystemControl* fuelSystem;

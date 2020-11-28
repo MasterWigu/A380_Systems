@@ -6,12 +6,10 @@
 #include "../../include/XPSDK303/CHeaders/XPLM/XPLMPlugin.h"
 #include "../../include/XPSDK303/CHeaders/XPLM/XPLMProcessing.h"
 
-#include "../FUEL/SystemControl.h"
+#include "SystemsControl.h"
 
-
+PluginControl::SystemsControl* systemsControl;
 
 float A380SystemsFLCB(float inElapsedSinceLastCall, float inElapsedTimeSinceLastFlightLoop, int inCounter, void *inRefcon);
-
-
 
 #endif //A380_SYSTEMS_PLUGINCONTROL_H
