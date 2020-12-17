@@ -6,7 +6,7 @@ If you are looking for the plane itself to try it or contribute to the display s
 
 It is assumed that if you are to contribute to this repository, you have some experience with C or C++ and with github. If not, or if you want to learn more, be sure to come by our [Discord](https://discord.gg/nQZTXMT) where there is someone that will gladly guide you in your first steps!
 
-The goal of this project is to create an as accurate as possible A380, so, all the code behind this plane is to be done according to the available documentation and information, which you can find in our [Drive](https://google.com)
+The goal of this project is to create an as accurate as possible A380, so, all the code behind this plane is to be done according to the available documentation and information, which you can find in our [Drive](https://drive.google.com/drive/folders/1EYOqc51IaWQJ9R1eLtywhzKNfAYQbdtA) (under the Documentation folder).
 
 ## Contributing
 
